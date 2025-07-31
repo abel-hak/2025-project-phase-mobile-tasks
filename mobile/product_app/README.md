@@ -1,16 +1,60 @@
-# product_app
+# Product App
 
-A new Flutter project.
+A Flutter-based product management application with enhanced features and optimized performance.
+
+## Features
+
+- Product CRUD operations
+- Advanced search functionality
+- Real-time updates
+- Responsive design
+- Data persistence
+- Error handling
+
+## Project Structure
+
+```
+lib/
+├── assets/
+├── config/
+├── models/
+├── screens/
+├── services/
+├── utils/
+└── main.dart
+```
+
+## Technical Stack
+
+- Flutter SDK
+- State Management
+- Local Storage
+- REST API integration
+- Custom UI components
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+1. Install Flutter SDK
+2. Clone the repository
+3. Run `flutter pub get`
+4. Configure environment variables if needed
+5. Run `flutter run`
 
-A few resources to get you started if this is your first Flutter project:
+## Screenshots
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Check the `screenshot/` directory for UI previews.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Development Guidelines
+
+- Follow Flutter best practices
+- Write clean, maintainable code
+- Add comments for complex logic
+- Test all features thoroughly
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request

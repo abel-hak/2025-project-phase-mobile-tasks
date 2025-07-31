@@ -1,16 +1,48 @@
-# linted_app
+# Linted App
 
-A new Flutter project.
+A Flutter application that demonstrates best practices in code quality and linting rules implementation.
+
+## Features
+
+- Implements strict Flutter linting rules
+- Follows Flutter best practices
+- Clean code architecture
+- Code quality enforcement
+- Example implementations of proper code structure
+
+## Project Structure
+
+```
+lib/
+├── config/
+├── models/
+├── screens/
+└── main.dart
+```
+
+## Linting Rules
+
+This project uses custom linting rules to ensure:
+- Consistent code formatting
+- Best practices enforcement
+- Code quality standards
+- Performance optimizations
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+1. Ensure Flutter is installed
+2. Clone the repository
+3. Run `flutter pub get`
+4. Run `flutter analyze` to check linting
+5. Run `flutter run` to start the app
 
-A few resources to get you started if this is your first Flutter project:
+## Code Standards
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Follows Flutter style guide
+- Uses recommended linting rules
+- Implements proper error handling
+- Maintains clean architecture principles
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Contributing
+
+Make sure to run `flutter analyze` before submitting any changes.
