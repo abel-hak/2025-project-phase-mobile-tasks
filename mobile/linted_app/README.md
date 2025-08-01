@@ -1,48 +1,49 @@
-# Linted App
+# Product Management App
 
-A Flutter application that demonstrates best practices in code quality and linting rules implementation.
+A Flutter-based mobile application for managing products with CRUD operations and search functionality.
 
 ## Features
 
-- Implements strict Flutter linting rules
-- Follows Flutter best practices
-- Clean code architecture
-- Code quality enforcement
-- Example implementations of proper code structure
+- Create, Read, Update, and Delete products
+- Search products by name
+- Detailed product view
+- Modern and responsive UI
+- Cross-platform support (iOS, Android, Web)
 
 ## Project Structure
 
 ```
 lib/
 ├── config/
+│   ├── page_transitions.dart
+│   └── routes.dart
 ├── models/
+│   └── product.dart
 ├── screens/
+│   ├── add_update_page.dart
+│   ├── details_page.dart
+│   ├── home_page.dart
+│   └── search_page.dart
 └── main.dart
 ```
 
-## Linting Rules
-
-This project uses custom linting rules to ensure:
-- Consistent code formatting
-- Best practices enforcement
-- Code quality standards
-- Performance optimizations
-
 ## Getting Started
 
-1. Ensure Flutter is installed
+1. Ensure you have Flutter installed
 2. Clone the repository
-3. Run `flutter pub get`
-4. Run `flutter analyze` to check linting
-5. Run `flutter run` to start the app
+3. Run `flutter pub get` to install dependencies
+4. Run `flutter run` to start the application
 
-## Code Standards
+## Screenshots
 
-- Follows Flutter style guide
-- Uses recommended linting rules
-- Implements proper error handling
-- Maintains clean architecture principles
+Check the `screenshot/` directory for application screenshots.
+
+## Dependencies
+
+- Flutter SDK
+- Material Design components
+- State management solutions
 
 ## Contributing
 
-Make sure to run `flutter analyze` before submitting any changes.
+Feel free to submit issues and enhancement requests.
