@@ -2,9 +2,9 @@
 
 A Flutter-based mobile application for managing products, built using Clean Architecture principles and Test-Driven Development (TDD).
 
-## Architecture Overview
+## Implementation Details
 
-The application follows Clean Architecture principles with the following layers:
+Detailed breakdown of the implementation:
 
 ### Domain Layer
 
@@ -103,23 +103,32 @@ lib/
 
 ## Architecture Overview
 
-The application follows Clean Architecture principles:
+The application follows Clean Architecture principles with three main layers:
 
 1. **Domain Layer**
-   - Contains business logic
+   - Contains business logic and entities
    - No dependencies on external packages
    - Pure Dart code
-   - Includes entities, use cases, and repository interfaces
+   - Includes:
+     - Entities (e.g., Product)
+     - Use Cases (CRUD operations)
+     - Repository Interfaces
 
-2. **Use Cases**
-   - Single responsibility principle
-   - Each use case represents one specific business action
-   - Independent of external implementations
+2. **Data Layer**
+   - Implements data access and storage
+   - Includes:
+     - Models (JSON serialization)
+     - Data Source Contracts
+       - Remote Data Source (API)
+       - Local Data Source (Cache)
+     - Repository Implementation
+   - Handles data conversion and caching
 
-3. **Repository Pattern**
-   - Abstract definition in domain layer
-   - Separates business logic from data sources
-   - Enables easy testing and modification of data sources
+3. **Presentation Layer**
+   - User interface and interaction
+   - Implements screens and widgets
+   - Uses Material Design components
+   - Handles user input and display
 
 ## Dependencies
 
