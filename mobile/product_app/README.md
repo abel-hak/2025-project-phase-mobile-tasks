@@ -1,60 +1,96 @@
-# Product App
+# eCommerce Mobile App
 
-A Flutter-based product management application with enhanced features and optimized performance.
+A Flutter-based mobile application for managing products, built using Clean Architecture principles and Test-Driven Development (TDD).
 
-## Features
+## Clean Architecture Implementation
 
-- Product CRUD operations
-- Advanced search functionality
-- Real-time updates
-- Responsive design
-- Data persistence
-- Error handling
+### Domain Layer
+
+#### Entities
+- `Product`: Core business entity with properties:
+  - id (String)
+  - name (String)
+  - description (String)
+  - price (double)
+  - imageUrl (String)
+
+#### Use Cases
+CRUD operations for products:
+- `InsertProductUseCase`: Add new products
+- `UpdateProductUseCase`: Modify existing products
+- `DeleteProductUseCase`: Remove products
+- `GetProductUseCase`: Retrieve product details
+
+#### Repository Interfaces
+- `ProductRepository`: Defines contract for product data operations
+  - insertProduct
+  - updateProduct
+  - deleteProduct
+  - getProduct
 
 ## Project Structure
 
 ```
 lib/
-├── assets/
+├── domain/
+│   ├── entities/
+│   │   └── product.dart
+│   ├── usecases/
+│   │   └── product_usecases.dart
+│   └── repositories/
+│       └── product_repository.dart
 ├── config/
-├── models/
+│   ├── page_transitions.dart
+│   └── routes.dart
 ├── screens/
-├── services/
-├── utils/
+│   ├── add_update_page.dart
+│   ├── details_page.dart
+│   ├── home_page.dart
+│   └── search_page.dart
 └── main.dart
 ```
 
-## Technical Stack
+## Features
 
-- Flutter SDK
-- State Management
-- Local Storage
-- REST API integration
-- Custom UI components
+- Create, Read, Update, and Delete products
+- Search products by name
+- Detailed product view
+- Modern and responsive UI
+- Clean Architecture design
+- Test-Driven Development approach
 
 ## Getting Started
 
-1. Install Flutter SDK
+1. Ensure you have Flutter installed
 2. Clone the repository
-3. Run `flutter pub get`
-4. Configure environment variables if needed
-5. Run `flutter run`
+3. Run `flutter pub get` to install dependencies
+4. Run `flutter run` to start the application
 
-## Screenshots
+## Architecture Overview
 
-Check the `screenshot/` directory for UI previews.
+The application follows Clean Architecture principles:
 
-## Development Guidelines
+1. **Domain Layer**
+   - Contains business logic
+   - No dependencies on external packages
+   - Pure Dart code
+   - Includes entities, use cases, and repository interfaces
 
-- Follow Flutter best practices
-- Write clean, maintainable code
-- Add comments for complex logic
-- Test all features thoroughly
+2. **Use Cases**
+   - Single responsibility principle
+   - Each use case represents one specific business action
+   - Independent of external implementations
+
+3. **Repository Pattern**
+   - Abstract definition in domain layer
+   - Separates business logic from data sources
+   - Enables easy testing and modification of data sources
+
+## Dependencies
+
+- Flutter SDK
+- Material Design components
 
 ## Contributing
 
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+Feel free to submit issues and enhancement requests.

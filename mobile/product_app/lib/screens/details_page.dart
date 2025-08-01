@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import '../domain/entities/product_entity.dart';
-import '../injection.dart';
-import '../config/routes.dart';
+import '../models/product.dart';
 
 class DetailsPage extends StatefulWidget {
-  final ProductEntity product;
+  final Product product;
 
   const DetailsPage({super.key, required this.product});
 
@@ -14,8 +12,6 @@ class DetailsPage extends StatefulWidget {
 
 class _DetailsPageState extends State<DetailsPage> {
   int selectedSize = 41;
-  bool _isLoading = false;
-  String? _error;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +43,7 @@ class _DetailsPageState extends State<DetailsPage> {
                       left: 16,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
@@ -185,26 +181,7 @@ class _DetailsPageState extends State<DetailsPage> {
             ),
           ),
 
-          // Error Message
-          if (_error != null)
-            Positioned(
-              bottom: 100,
-              left: 0,
-              right: 0,
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  _error!,
-                  style: const TextStyle(color: Colors.white),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
+          // Bottom buttons
         ],
       ),
       bottomNavigationBar: Container(
@@ -223,7 +200,7 @@ class _DetailsPageState extends State<DetailsPage> {
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: _isLoading ? null : _deleteProduct,
+                onPressed: () {},
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.red,
                   side: const BorderSide(color: Colors.red),
@@ -232,22 +209,13 @@ class _DetailsPageState extends State<DetailsPage> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                        ),
-                      )
-                    : const Text('DELETE'),
+                child: const Text('DELETE'),
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: ElevatedButton(
-                onPressed: _isLoading ? null : _editProduct,
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,
@@ -256,75 +224,12 @@ class _DetailsPageState extends State<DetailsPage> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : const Text('UPDATE'),
+                child: const Text('UPDATE'),
               ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _deleteProduct() async {
-    final shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Product'),
-        content: const Text('Are you sure you want to delete this product?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-
-    if (shouldDelete != true) return;
-
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      await Injection.instance.deleteProduct(widget.product.id);
-      if (mounted) {
-        Navigator.pop(context, true); // true indicates product was deleted
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _error = 'Failed to delete product: $e';
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _editProduct() async {
-    final updatedProduct = await Navigator.pushNamed(
-      context,
-      Routes.editProduct,
-      arguments: widget.product,
-    );
-
-    if (updatedProduct is ProductEntity && mounted) {
-      Navigator.pop(context, updatedProduct); // Pass back the updated product
-    }
   }
 }

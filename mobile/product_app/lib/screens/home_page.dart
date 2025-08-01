@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../domain/entities/product_entity.dart';
-import '../injection.dart';
 import '../config/routes.dart';
+import '../models/product.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,59 +10,36 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<ProductEntity> products = [];
-  bool _isLoading = false;
-  String? _error;
-
-  Future<void> _loadProducts() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      final loadedProducts = await Injection.instance.getAllProducts();
-      setState(() {
-        products = loadedProducts;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Failed to load products: $e';
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _addProduct(ProductEntity? newProduct) async {
-    if (newProduct != null) {
-      setState(() {
-        _isLoading = true;
-        _error = null;
-      });
-
-      try {
-        final insertedProduct = await Injection.instance.insertProduct(
-          newProduct,
-        );
-        setState(() {
-          products.add(insertedProduct);
-          _isLoading = false;
-        });
-      } catch (e) {
-        setState(() {
-          _error = 'Failed to add product: $e';
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProducts();
-  }
+  final List<Product> products = [
+    Product(
+      name: 'Air Jordan 1 Retro High',
+      description:
+          'Iconic Air Jordan 1 Retro High sneakers. Premium materials with classic design and exceptional comfort for everyday style.',
+      price: 180,
+      category: "Men's shoe",
+      rating: 4.8,
+      imageUrl:
+          'assets/images/Air-Jordan-1-Retro-High-Travis-Scott-Product.png',
+    ),
+    Product(
+      name: 'Puma Shoes',
+      description:
+          'Contemporary sports shoes designed for performance and style. Features advanced cushioning and breathable materials.',
+      price: 150,
+      category: "Men's shoe",
+      rating: 4.5,
+      imageUrl: 'assets/images/puma.png',
+    ),
+    Product(
+      name: 'Travis Scott Edition',
+      description:
+          'Limited edition Travis Scott collaboration sneakers. Unique design with premium materials and exclusive styling.',
+      price: 135,
+      category: "Men's shoe",
+      rating: 4.2,
+      imageUrl: 'assets/images/travis.png',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -89,16 +65,16 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(width: 12),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
+                        children: [
+                          const Text(
                             'July 14, 2023',
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
                           ),
-                          Text(
+                          const Text(
                             'Hello, Yohannes',
                             style: TextStyle(
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              fontSize: 14,
                             ),
                           ),
                         ],
@@ -115,7 +91,7 @@ class _HomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.1),
+                              color: Colors.grey.withValues(alpha: 0.1),
                               spreadRadius: 1,
                               blurRadius: 1,
                             ),
@@ -152,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
+                          color: Colors.grey.withValues(alpha: 0.1),
                           spreadRadius: 1,
                           blurRadius: 1,
                         ),
@@ -173,23 +149,9 @@ class _HomePageState extends State<HomePage> {
 
               const SizedBox(height: 16),
 
-              // Error Message
-              if (_error != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: Text(
-                    _error!,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ),
-
-              // Loading Indicator or Product List
+              // Product List
               Expanded(
-                child: _isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : RefreshIndicator(
-                        onRefresh: _loadProducts,
-                        child: ListView.builder(
+                child: ListView.builder(
                   itemCount: products.length,
                   itemBuilder: (context, index) {
                     return Padding(
@@ -234,14 +196,14 @@ class _HomePageState extends State<HomePage> {
                                       children: [
                                         Text(
                                           products[index].name,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontWeight: FontWeight.w600,
                                             fontSize: 16,
                                           ),
                                         ),
                                         Text(
                                           '\$${products[index].price}',
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             color: Colors.blue,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -256,22 +218,22 @@ class _HomePageState extends State<HomePage> {
                                       children: [
                                         Text(
                                           products[index].category,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             color: Colors.grey,
                                             fontSize: 12,
                                           ),
                                         ),
                                         Row(
                                           children: [
-                                            Icon(
+                                            const Icon(
                                               Icons.star,
                                               color: Colors.amber,
                                               size: 16,
                                             ),
-                                            SizedBox(width: 4),
+                                            const SizedBox(width: 4),
                                             Text(
                                               '(${products[index].rating})',
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 color: Colors.grey,
                                               ),
                                             ),
@@ -290,7 +252,6 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
               ),
-            ),
             ],
           ),
         ),
@@ -303,8 +264,10 @@ class _HomePageState extends State<HomePage> {
             context,
             Routes.addProduct,
           );
-          if (newProduct is ProductEntity) {
-            await _addProduct(newProduct);
+          if (newProduct != null && newProduct is Product) {
+            setState(() {
+              products.add(newProduct);
+            });
           }
         },
         child: const Icon(Icons.add_rounded, size: 24),

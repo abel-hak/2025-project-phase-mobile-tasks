@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../domain/entities/product_entity.dart';
-import '../injection.dart';
+
 import '../config/routes.dart';
+import '../models/product.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -12,39 +12,27 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   double _priceRange = 120;
-  List<ProductEntity> _products = [];
-  bool _isLoading = false;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProducts();
-  }
-
-  Future<void> _loadProducts() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      final products = await Injection.instance.getAllProducts();
-      if (mounted) {
-        setState(() {
-          _products = products;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _error = 'Failed to load products: $e';
-          _isLoading = false;
-        });
-      }
-    }
-  }
+  final List<Product> products = [
+    Product(
+      name: 'Air Jordan 1 Retro High',
+      description:
+          'Iconic Air Jordan 1 Retro High sneakers. Premium materials with classic design and exceptional comfort for everyday style.',
+      price: 180,
+      category: "Men's shoe",
+      rating: 4.8,
+      imageUrl:
+          'assets/images/Air-Jordan-1-Retro-High-Travis-Scott-Product.png',
+    ),
+    Product(
+      name: 'Puma Shoes',
+      description:
+          'Contemporary sports shoes designed for performance and style. Features advanced cushioning and breathable materials.',
+      price: 150,
+      category: "Men's shoe",
+      rating: 4.5,
+      imageUrl: 'assets/images/puma.png',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +70,7 @@ class _SearchPageState extends State<SearchPage> {
                         const Expanded(
                           child: TextField(
                             decoration: InputDecoration(
-                              hintText: 'Search by name...',
+                              hintText: 'Leather',
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.symmetric(
                                 horizontal: 16,
@@ -98,9 +86,7 @@ class _SearchPageState extends State<SearchPage> {
                           margin: const EdgeInsets.all(4),
                           child: IconButton(
                             icon: const Icon(Icons.tune, color: Colors.white),
-                            onPressed: () {
-                              // TODO: Implement filter toggle
-                            },
+                            onPressed: () {},
                           ),
                         ),
                       ],
@@ -109,102 +95,89 @@ class _SearchPageState extends State<SearchPage> {
 
                   const SizedBox(height: 18),
 
-                  if (_error != null)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text(
-                        _error!,
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                    ),
-
-                  if (_isLoading)
-                    const Center(child: CircularProgressIndicator())
-                  else
-                    ..._products.map((product) {
-                      return Container(
+                  // Product List
+                  ...List.generate(
+                    products.length,
+                    (index) => InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          Routes.productDetails,
+                          arguments: products[index],
+                        );
+                      },
+                      child: Container(
                         margin: const EdgeInsets.only(bottom: 8),
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              Routes.productDetails,
-                              arguments: product,
-                            );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.asset(
-                                  product.imageUrl,
-                                  height: 250,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.asset(
+                                products[index].imageUrl,
+                                height: 250,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
                               ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 4,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      product.name,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    Text(
-                                      '\$${product.price}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Row(
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    product.category,
+                                    products[index].name,
                                     style: const TextStyle(
-                                      color: Colors.grey,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    '\$${products[index].price}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
                                       fontSize: 14,
                                     ),
                                   ),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.star,
-                                        color: Colors.amber,
-                                        size: 16,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '(${product.rating})',
-                                        style: const TextStyle(
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
                                 ],
                               ),
-                            ],
-                          ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  products[index].category,
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.star,
+                                      color: Colors.amber,
+                                      size: 16,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '(${products[index].rating})',
+                                      style: const TextStyle(
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      );
-                    }).toList(),
+                      ),
+                    ),
+                  ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
                   // Category Filter
                   const Text(
@@ -255,23 +228,23 @@ class _SearchPageState extends State<SearchPage> {
                       },
                     ),
                   ),
+
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
           ),
 
-          // APPLY Button (pinned at bottom)
+          // APPLY button pinned at bottom
           Padding(
             padding: const EdgeInsets.all(12.0),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  // Apply filter logic here
-                },
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -279,9 +252,9 @@ class _SearchPageState extends State<SearchPage> {
                 child: const Text(
                   'APPLY',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
                     color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
                   ),
                 ),
               ),

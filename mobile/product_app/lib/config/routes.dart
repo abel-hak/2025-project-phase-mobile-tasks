@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'page_transitions.dart';
-import '../screens/home_page.dart';
+
+import '../models/product.dart';
 import '../screens/add_update_page.dart';
 import '../screens/details_page.dart';
+import '../screens/home_page.dart';
 import '../screens/search_page.dart';
-import '../domain/entities/product_entity.dart';
+import 'page_transitions.dart';
 
 class Routes {
   static const String home = '/';
@@ -24,12 +25,12 @@ class Routes {
           child: const AddUpdatePage(),
         );
       case editProduct:
-        final product = settings.arguments as ProductEntity;
+        final product = settings.arguments as Product;
         return SlidePageRoute(
           child: AddUpdatePage(product: product),
         );
       case productDetails:
-        final product = settings.arguments as ProductEntity;
+        final product = settings.arguments as Product;
         return SlidePageRoute(
           child: DetailsPage(product: product),
         );

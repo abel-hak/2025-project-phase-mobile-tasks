@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import '../domain/entities/product_entity.dart';
-import '../injection.dart';
+import '../models/product.dart';
 
 class AddUpdatePage extends StatefulWidget {
-  final ProductEntity? product;
+  final Product? product;
 
   const AddUpdatePage({super.key, this.product});
 
@@ -13,8 +12,6 @@ class AddUpdatePage extends StatefulWidget {
 
 class _AddUpdatePageState extends State<AddUpdatePage> {
   final _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
-  String? _error;
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
@@ -41,7 +38,6 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
     _initialPrice = _priceController.text;
     _initialCategory = _categoryController.text;
 
-    // Listen for changes in all text controllers
     _nameController.addListener(_onFormChanged);
     _descriptionController.addListener(_onFormChanged);
     _priceController.addListener(_onFormChanged);
@@ -88,6 +84,20 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
     return result ?? false;
   }
 
+  void _saveProduct() {
+    if (_formKey.currentState!.validate()) {
+      final product = Product(
+        name: _nameController.text,
+        description: _descriptionController.text,
+        price: double.parse(_priceController.text),
+        category: _categoryController.text,
+        rating: widget.product?.rating ?? 0.0,
+        imageUrl: widget.product?.imageUrl ?? 'assets/images/travis.png',
+      );
+      Navigator.pop(context, product);
+    }
+  }
+
   @override
   void dispose() {
     _nameController.removeListener(_onFormChanged);
@@ -102,40 +112,6 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
     super.dispose();
   }
 
-  Future<void> _saveProduct() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      final product = ProductEntity(
-        id: widget.product?.id ?? '',  // Empty for new products
-        name: _nameController.text,
-        description: _descriptionController.text,
-        price: double.parse(_priceController.text),
-        category: _categoryController.text,
-        rating: widget.product?.rating ?? 0.0,
-        imageUrl: widget.product?.imageUrl ?? 'assets/images/travis.png',
-      );
-
-      final savedProduct = widget.product != null
-          ? await Injection.instance.updateProduct(product)
-          : await Injection.instance.insertProduct(product);
-
-      if (mounted) {
-        Navigator.pop(context, savedProduct);
-      }
-    } catch (e) {
-      setState(() {
-        _error = 'Failed to save product: $e';
-        _isLoading = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -148,7 +124,8 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () async {
-              if (await _onWillPop()) {
+              final shouldPop = await _onWillPop();
+              if (shouldPop && context.mounted) {
                 Navigator.pop(context);
               }
             },
@@ -254,21 +231,11 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
                 ),
                 const SizedBox(height: 32),
 
-                // Error Message
-                if (_error != null)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: Text(
-                      _error!,
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  ),
-
                 // Save Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _saveProduct,
+                    onPressed: _saveProduct,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -276,16 +243,7 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : Text(
+                    child: Text(
                       widget.product != null ? 'Update Product' : 'Add Product',
                       style: const TextStyle(
                         fontSize: 16,
