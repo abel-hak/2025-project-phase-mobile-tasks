@@ -42,4 +42,28 @@ class ProductModel extends Product {
       'rating': rating,
     };
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ProductModel &&
+        other.id == id &&
+        other.name == name &&
+        other.description == description &&
+        other.price == price &&
+        other.imageUrl == imageUrl &&
+        other.category == category &&
+        other.rating == rating;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        name.hashCode ^
+        description.hashCode ^
+        price.hashCode ^
+        imageUrl.hashCode ^
+        category.hashCode ^
+        rating.hashCode;
+  }
 }

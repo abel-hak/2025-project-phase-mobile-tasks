@@ -60,6 +60,16 @@ The repository layer implements the domain layer contracts and coordinates data 
   - Extends Product entity
   - Implements JSON serialization/deserialization
   - Handles data type conversion
+  - Implements equals and hashCode for testing
+
+#### Local Data Source
+- Uses SharedPreferences for persistent storage
+- Implements CRUD operations:
+  - Cache products with JSON serialization
+  - Retrieve cached products
+  - Update existing cached products
+  - Remove products from cache
+- Proper error handling with CacheException
 
 ## Project Structure
 
