@@ -155,6 +155,20 @@ The application follows Clean Architecture principles with three main layers:
 
 - Flutter SDK
 - Material Design components
+- internet_connection_checker: Network connectivity detection
+
+## Network Handling
+
+1. **NetworkInfo Implementation**
+   - Uses InternetConnectionChecker for reliable connectivity detection
+   - Abstract NetworkInfo interface for dependency inversion
+   - NetworkInfoImpl concrete implementation
+   - Unit tested with mock-based testing
+
+2. **Network-Aware Features**
+   - Automatic online/offline mode switching
+   - Local data caching for offline access
+   - Graceful error handling for network failures
 
 ## Contributing
 
