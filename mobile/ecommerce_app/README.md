@@ -47,7 +47,19 @@ The repository layer implements the domain layer contracts and coordinates data 
    - Handles CacheException for local operations
    - Falls back to cached data when remote fails
 
-3. **Testing**
+3. **Data Sources**
+   - **Remote Data Source**:
+     - Implements ProductRemoteDataSource contract
+     - Mock API implementation (ready for real API integration)
+     - Proper error handling with ServerException
+     - Simulated network delays for testing
+     - Comprehensive test coverage for all operations
+   - **Local Data Source**:
+     - Uses SharedPreferences for caching
+     - JSON serialization/deserialization
+     - Proper error handling with CacheException
+
+4. **Testing**
    - Comprehensive unit tests
    - Mock-based testing using Mockito
    - Tests for online/offline scenarios
