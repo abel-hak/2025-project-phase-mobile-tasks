@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Row(
                     children: [
-                      const CircleAvatar(
+                      CircleAvatar(
                         radius: 20,
                         backgroundColor: Colors.grey,
                       ),
@@ -66,11 +66,11 @@ class _HomePageState extends State<HomePage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'July 14, 2023',
-                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
                           ),
-                          const Text(
+                          Text(
                             'Hello, Yohannes',
                             style: TextStyle(
                               fontSize: 16,

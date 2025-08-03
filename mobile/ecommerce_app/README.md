@@ -32,6 +32,27 @@ CRUD operations for products:
   - deleteProduct
   - getProduct
 
+#### Repository Layer
+
+The repository layer implements the domain layer contracts and coordinates data operations:
+
+1. **Network-Aware Repository**
+   - Uses NetworkInfo to check connectivity
+   - Remote data source when online
+   - Local data source when offline
+   - Automatic caching of remote data
+
+2. **Error Handling**
+   - Handles ServerException for remote operations
+   - Handles CacheException for local operations
+   - Falls back to cached data when remote fails
+
+3. **Testing**
+   - Comprehensive unit tests
+   - Mock-based testing using Mockito
+   - Tests for online/offline scenarios
+   - Tests for success and error cases
+
 ### Data Layer
 
 #### Models
