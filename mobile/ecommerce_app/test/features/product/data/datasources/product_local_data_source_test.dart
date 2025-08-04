@@ -22,7 +22,7 @@ void main() {
     );
   });
 
-  group('getProduct', () {
+  group('getCachedProduct', () {
     final tId = '1';
     final tProductModel = ProductModel(
       id: tId,
@@ -40,7 +40,7 @@ void main() {
       when(mockSharedPreferences.getString('$CACHED_PRODUCTS_KEY:$tId'))
           .thenReturn(json.encode(tProductModel.toJson()));
       // act
-      final result = await dataSource.getProduct(tId);
+      final result = await dataSource.getCachedProduct(tId);
       // assert
       verify(mockSharedPreferences.getString('$CACHED_PRODUCTS_KEY:$tId'));
       expect(result, equals(tProductModel));
@@ -51,7 +51,7 @@ void main() {
       when(mockSharedPreferences.getString('$CACHED_PRODUCTS_KEY:$tId'))
           .thenReturn(null);
       // act
-      final call = dataSource.getProduct;
+      final call = dataSource.getCachedProduct;
       // assert
       expect(() => call(tId), throwsA(isA<CacheException>()));
     });

@@ -1,15 +1,20 @@
 import '../models/product_model.dart';
 
 abstract class ProductRemoteDataSource {
+  /// Gets all Products from the remote data source
+  /// 
+  /// Throws a ServerException if something goes wrong
+  Future<List<ProductModel>> getAllProducts();
+
   /// Gets a Product by its ID from the remote data source
   /// 
   /// Throws a ServerException if something goes wrong
   Future<ProductModel> getProduct(String id);
 
-  /// Inserts a new Product into the remote data source
+  /// Creates a new Product in the remote data source
   /// 
   /// Throws a ServerException if something goes wrong
-  Future<void> insertProduct(ProductModel product);
+  Future<void> createProduct(ProductModel product);
 
   /// Updates an existing Product in the remote data source
   /// 

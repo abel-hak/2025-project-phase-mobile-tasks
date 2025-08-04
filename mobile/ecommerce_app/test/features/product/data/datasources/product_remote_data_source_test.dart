@@ -1,7 +1,8 @@
+import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:mockito/annotations.dart';
 import 'package:product_app/core/error/exceptions.dart';
 import 'package:product_app/features/product/data/datasources/product_remote_data_source_impl.dart';
 import 'package:product_app/features/product/data/models/product_model.dart';
@@ -9,13 +10,18 @@ import 'package:product_app/features/product/data/models/product_model.dart';
 import 'product_remote_data_source_test.mocks.dart';
 
 @GenerateMocks([http.Client])
+const baseUrl = 'https://example.com';
+
 void main() {
   late ProductRemoteDataSourceImpl dataSource;
   late MockClient mockHttpClient;
 
   setUp(() {
     mockHttpClient = MockClient();
-    dataSource = ProductRemoteDataSourceImpl(client: mockHttpClient);
+    dataSource = ProductRemoteDataSourceImpl(
+      client: mockHttpClient,
+      baseUrl: baseUrl,
+    );
   });
 
   group('getProduct', () {
@@ -38,8 +44,8 @@ void main() {
     });
   });
 
-  group('insertProduct', () {
-    final tProduct = ProductModel(
+  group('createProduct', () {
+    final tProductModel = ProductModel(
       id: '1',
       name: 'Test Product',
       description: 'Test Description',
@@ -49,9 +55,35 @@ void main() {
       rating: 4.5,
     );
 
+    test('should perform a POST request to create a product', () async {
+      // arrange
+      when(mockHttpClient.post(
+        any,
+        headers: anyNamed('headers'),
+        body: anyNamed('body'),
+      )).thenAnswer((_) async => http.Response('{}', 200));
+
+      // act
+      await dataSource.createProduct(tProductModel);
+
+      // assert
+      verify(mockHttpClient.post(
+        Uri.parse('$baseUrl/products'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(tProductModel.toJson()),
+      ));
+    });
+
     test('should complete successfully when price is valid', () async {
+      // arrange
+      when(mockHttpClient.post(
+        Uri.parse('$baseUrl/products'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(tProductModel.toJson()),
+      )).thenAnswer((_) async => http.Response('{}', 200));
+
       // act & assert
-      expect(dataSource.insertProduct(tProduct), completes);
+      await expectLater(dataSource.createProduct(tProductModel), completes);
     });
 
     test('should throw ServerException when price is negative', () async {
@@ -67,7 +99,7 @@ void main() {
       );
 
       // act
-      final call = dataSource.insertProduct;
+      final call = dataSource.createProduct;
 
       // assert
       expect(() => call(invalidProduct), throwsA(isA<ServerException>()));

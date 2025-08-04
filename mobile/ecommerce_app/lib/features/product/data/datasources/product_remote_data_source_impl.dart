@@ -14,11 +14,26 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   });
 
   @override
+  Future<List<ProductModel>> getAllProducts() async {
+    final response = await client.get(
+      Uri.parse('$baseUrl/products'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = json.decode(response.body);
+      return jsonList.map((json) => ProductModel.fromJson(json)).toList();
+    } else {
+      throw ServerException();
+    }
+  }
+
+  @override
   Future<ProductModel> getProduct(String id) async {
     try {
       // Simulate API delay
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       // Mock successful response
       if (id == '1') {
         return ProductModel(
@@ -39,15 +54,15 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   }
 
   @override
-  Future<void> insertProduct(ProductModel product) async {
+  Future<void> createProduct(ProductModel product) async {
     try {
-      // Simulate API delay
-      await Future.delayed(const Duration(milliseconds: 500));
-      
-      // Mock successful insertion
-      if (product.price >= 0) {
-        return;
-      } else {
+      final response = await client.post(
+        Uri.parse('$baseUrl/products'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(product.toJson()),
+      );
+
+      if (response.statusCode != 201 && response.statusCode != 200) {
         throw ServerException();
       }
     } catch (e) {
@@ -60,7 +75,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     try {
       // Simulate API delay
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       // Mock successful update
       if (product.id.isNotEmpty) {
         return;
@@ -77,7 +92,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     try {
       // Simulate API delay
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       // Mock successful deletion
       if (id.isNotEmpty) {
         return;

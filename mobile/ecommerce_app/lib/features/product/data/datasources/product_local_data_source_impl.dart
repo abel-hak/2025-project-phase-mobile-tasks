@@ -13,13 +13,30 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
   ProductLocalDataSourceImpl({required this.sharedPreferences});
 
   @override
-  Future<ProductModel> getProduct(String id) async {
+  Future<List<ProductModel>> getCachedProducts() async {
+    final jsonString = await sharedPreferences.getString('CACHED_PRODUCTS');
+    if (jsonString != null) {
+      final List<dynamic> jsonList = json.decode(jsonString);
+      return jsonList.map((json) => ProductModel.fromJson(json)).toList();
+    } else {
+      throw CacheException();
+    }
+  }
+
+  @override
+  Future<ProductModel> getCachedProduct(String id) async {
     final jsonString = sharedPreferences.getString('$CACHED_PRODUCTS_KEY:$id');
     if (jsonString != null) {
       return ProductModel.fromJson(json.decode(jsonString));
     } else {
       throw CacheException();
     }
+  }
+
+  @override
+  Future<void> cacheProducts(List<ProductModel> products) async {
+    final List<Map<String, dynamic>> jsonList = products.map((product) => product.toJson()).toList();
+    await sharedPreferences.setString('CACHED_PRODUCTS', json.encode(jsonList));
   }
 
   @override

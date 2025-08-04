@@ -65,39 +65,83 @@ The repository layer implements the domain layer contracts and coordinates data 
    - Tests for online/offline scenarios
    - Tests for success and error cases
 
-### Data Layer
+### Architecture Overview
 
-#### Models
-- `ProductModel`: Data representation of Product entity
-  - Extends Product entity
-  - Implements JSON serialization/deserialization
-  - Handles data type conversion
-  - Implements equals and hashCode for testing
+#### 1. Presentation Layer
+- **BLoC Pattern**
+  - Separates business logic from UI
+  - Events: LoadAllProduct, GetSingleProduct, UpdateProduct, DeleteProduct, CreateProduct
+  - States: Initial, Loading, LoadedAllProduct, LoadedSingleProduct, Error
+  - Comprehensive unit tests for all events and states
 
-#### Local Data Source
-- Uses SharedPreferences for persistent storage
-- Implements CRUD operations:
-  - Cache products with JSON serialization
-  - Retrieve cached products
-  - Update existing cached products
-  - Remove products from cache
-- Proper error handling with CacheException
+#### 2. Domain Layer
+- **Entities**
+  - `Product`: Core business entity
+  - Properties: id, name, description, price, imageUrl, category, rating
+
+- **Use Cases**
+  - CreateProductUseCase
+  - UpdateProductUseCase
+  - DeleteProductUseCase
+  - GetProductUseCase
+  - GetAllProductsUseCase
+
+- **Repository Contracts**
+  - ProductRepository interface defining data operations
+
+#### 3. Data Layer
+- **Models**
+  - `ProductModel`: Data representation of Product entity
+  - JSON serialization/deserialization
+  - Type conversion and equality implementations
+
+- **Repository Implementation**
+  - Network-aware with automatic offline fallback
+  - Coordinated remote/local data source usage
+  - Error handling with Either type from dartz
+
+- **Remote Data Source**
+  - Mock API implementation (HTTP-based)
+  - Proper error handling with ServerException
+  - Ready for real API integration
+
+- **Local Data Source**
+  - SharedPreferences-based caching
+  - JSON serialization for storage
+  - Proper error handling with CacheException
+
+#### 4. Core Layer
+- **Network**
+  - NetworkInfo interface
+  - InternetConnectionChecker implementation
+  - Reliable connectivity detection
+
+- **Error Handling**
+  - Custom exceptions (ServerException, CacheException)
+  - Failure classes for domain layer
+  - Either type for functional error handling
 
 ## Project Structure
 
 ```
 lib/
-├── core/            # Core functionality and shared components
-├── features/
-│   └── product/     # Product feature module
-│       └── data/
-│           └── models/
-│               └── product_model.dart
-├── domain/
-│   ├── entities/
-│   │   └── product.dart
-│   ├── usecases/
-│   │   └── product_usecases.dart
+├── core/                    # Core functionality and shared components
+│   ├── error/              # Error handling (exceptions, failures)
+│   └── network/            # Network connectivity handling
+└── features/
+    └── product/            # Product feature module
+        ├── data/           # Data layer
+        │   ├── datasources/  # Remote and local data sources
+        │   ├── models/      # Data models
+        │   └── repositories/ # Repository implementations
+        ├── domain/         # Domain layer
+        │   ├── entities/    # Business entities
+        │   ├── repositories/ # Repository contracts
+        │   └── usecases/    # Business use cases
+        └── presentation/    # Presentation layer
+            ├── bloc/        # BLoC pattern implementation
+            ├── pages/       # Screen implementations
+            └── widgets/     # Reusable UI components
 │   └── repositories/
 │       └── product_repository.dart
 ├── config/
