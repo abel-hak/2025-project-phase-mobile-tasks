@@ -48,6 +48,26 @@ The repository layer implements the domain layer contracts and coordinates data 
    - Falls back to cached data when remote fails
 
 3. **Data Sources**
+
+### Dependency Injection
+
+The app uses the `get_it` package for dependency injection to manage and provide dependencies throughout the application:
+
+1. **Service Locator**
+   - Centralized dependency container using `GetIt`
+   - Singleton instance accessible throughout the app
+
+2. **Dependency Registration**
+   - BLoC: Factory registration for new instances
+   - Use Cases: Lazy singletons
+   - Repository: Lazy singleton with implementations
+   - Data Sources: Lazy singletons with implementations
+   - External Dependencies: Shared preferences, HTTP client, network checker
+
+3. **Initialization**
+   - Asynchronous initialization for external dependencies
+   - Proper registration order respecting dependency chains
+   - Automated testing of dependency registration
    - **Remote Data Source**:
      - Implements ProductRemoteDataSource contract
      - Mock API implementation (ready for real API integration)
