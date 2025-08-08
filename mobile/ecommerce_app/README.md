@@ -229,40 +229,6 @@ The app uses the `get_it` package for dependency injection to manage and provide
   - Failure classes for domain layer
   - Either type for functional error handling
 
-## Project Structure
-
-```
-lib/
-├── core/                    # Core functionality and shared components
-│   ├── error/              # Error handling (exceptions, failures)
-│   └── network/            # Network connectivity handling
-└── features/
-    └── product/            # Product feature module
-        ├── data/           # Data layer
-        │   ├── datasources/  # Remote and local data sources
-        │   ├── models/      # Data models
-        │   └── repositories/ # Repository implementations
-        ├── domain/         # Domain layer
-        │   ├── entities/    # Business entities
-        │   ├── repositories/ # Repository contracts
-        │   └── usecases/    # Business use cases
-        └── presentation/    # Presentation layer
-            ├── bloc/        # BLoC pattern implementation
-            ├── pages/       # Screen implementations
-            └── widgets/     # Reusable UI components
-│   └── repositories/
-│       └── product_repository.dart
-├── config/
-│   ├── page_transitions.dart
-│   └── routes.dart
-├── screens/
-│   ├── add_update_page.dart
-│   ├── details_page.dart
-│   ├── home_page.dart
-│   └── search_page.dart
-└── main.dart
-```
-
 ## Data Flow
 
 1. UI Layer (Screens)
@@ -296,34 +262,6 @@ lib/
 3. Run `flutter pub get` to install dependencies
 4. Run `flutter run` to start the application
 
-## Architecture Overview
-
-The application follows Clean Architecture principles with three main layers:
-
-1. **Domain Layer**
-   - Contains business logic and entities
-   - No dependencies on external packages
-   - Pure Dart code
-   - Includes:
-     - Entities (e.g., Product)
-     - Use Cases (CRUD operations)
-     - Repository Interfaces
-
-2. **Data Layer**
-   - Implements data access and storage
-   - Includes:
-     - Models (JSON serialization)
-     - Data Source Contracts
-       - Remote Data Source (API)
-       - Local Data Source (Cache)
-     - Repository Implementation
-   - Handles data conversion and caching
-
-3. **Presentation Layer**
-   - User interface and interaction
-   - Implements screens and widgets
-   - Uses Material Design components
-   - Handles user input and display
 
 ## Dependencies
 

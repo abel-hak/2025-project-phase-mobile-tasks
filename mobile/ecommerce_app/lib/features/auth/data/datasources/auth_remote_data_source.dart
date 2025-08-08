@@ -87,11 +87,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (userResponse.statusCode == 200) {
-        final userData = json.decode(userResponse.body)['data'];
+        final responseData = json.decode(userResponse.body);
+        final userData = responseData['data'];
+
+        if (userData == null) {
+          // If user data is not available, create AuthModel with token and email
+          return AuthModel(
+            id: '', // Use empty string as fallback
+            name: email.split('@')[0], // Use email prefix as fallback name
+            email: email,
+            token: token,
+          );
+        }
+
         return AuthModel(
-          id: userData['_id'] ?? userData['id'],
-          name: userData['name'],
-          email: userData['email'],
+          id: userData['_id'] ?? userData['id'] ?? '',
+          name: userData['name'] ?? email.split('@')[0],
+          email: userData['email'] ?? email,
           token: token,
         );
       } else {
@@ -157,12 +169,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw ServerException(message: 'Failed to fetch user details');
     }
 
-    final userData = json.decode(userResponse.body)['data'];
+    final responseData = json.decode(userResponse.body);
+    final userData = responseData['data'];
+
+    if (userData == null) {
+      // If user data is not available, create AuthModel with token only
+      return AuthModel(
+        id: '', // Use empty string or generate a temporary ID
+        name: name, // Use the name provided during signup
+        email: email, // Use the email provided during signup
+        token: token,
+      );
+    }
 
     return AuthModel(
-      id: userData['_id'] ?? userData['id'],
-      name: userData['name'],
-      email: userData['email'],
+      id: userData['_id'] ?? userData['id'] ?? '',
+      name: userData['name'] ?? name,
+      email: userData['email'] ?? email,
       token: token,
     );
   }
