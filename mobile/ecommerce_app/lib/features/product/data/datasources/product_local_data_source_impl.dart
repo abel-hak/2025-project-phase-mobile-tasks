@@ -19,7 +19,7 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
       final List<dynamic> jsonList = json.decode(jsonString);
       return jsonList.map((json) => ProductModel.fromJson(json)).toList();
     } else {
-      throw CacheException();
+      throw CacheException(message: 'Failed to cache the product');
     }
   }
 
@@ -29,7 +29,7 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
     if (jsonString != null) {
       return ProductModel.fromJson(json.decode(jsonString));
     } else {
-      throw CacheException();
+      throw CacheException(message: 'Failed to cache the product');
     }
   }
 
@@ -47,14 +47,14 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
       jsonString,
     );
     if (!success) {
-      throw CacheException();
+      throw CacheException(message: 'Failed to cache the product');
     }
   }
 
   @override
   Future<void> updateCachedProduct(ProductModel product) async {
     if (!sharedPreferences.containsKey('$CACHED_PRODUCTS_KEY:${product.id}')) {
-      throw CacheException();
+      throw CacheException(message: 'Failed to cache the product');
     }
     final jsonString = json.encode(product.toJson());
     final success = await sharedPreferences.setString(
@@ -62,18 +62,18 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
       jsonString,
     );
     if (!success) {
-      throw CacheException();
+      throw CacheException(message: 'Failed to cache the product');
     }
   }
 
   @override
   Future<void> removeCachedProduct(String id) async {
     if (!sharedPreferences.containsKey('$CACHED_PRODUCTS_KEY:$id')) {
-      throw CacheException();
+      throw CacheException(message: 'Failed to cache the product');
     }
     final success = await sharedPreferences.remove('$CACHED_PRODUCTS_KEY:$id');
     if (!success) {
-      throw CacheException();
+      throw CacheException(message: 'Failed to cache the product');
     }
   }
 }

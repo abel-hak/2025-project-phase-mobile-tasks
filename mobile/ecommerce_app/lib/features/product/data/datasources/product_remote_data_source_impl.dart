@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../../../../core/error/exceptions.dart';
 import '../models/product_model.dart';
@@ -10,97 +11,132 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
   ProductRemoteDataSourceImpl({
     required this.client,
-    this.baseUrl = 'https://mock-ecommerce-api.dev/v1',
+    this.baseUrl = 'https://g5-flutter-learning-path-be.onrender.com/api/v2',
   });
 
+  Map<String, String> _getHeaders(String? token) => {
+    'Content-Type': 'application/json',
+    if (token != null) 'Authorization': 'Bearer $token',
+  };
+
   @override
-  Future<List<ProductModel>> getAllProducts() async {
+  Future<List<ProductModel>> getAllProducts({String? token}) async {
     final response = await client.get(
       Uri.parse('$baseUrl/products'),
-      headers: {'Content-Type': 'application/json'},
+      headers: _getHeaders(token),
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonList = json.decode(response.body);
+      final jsonMap = json.decode(response.body);
+      final List<dynamic> jsonList = jsonMap['data'];
       return jsonList.map((json) => ProductModel.fromJson(json)).toList();
+    } else if (response.statusCode == 401) {
+      throw UnauthorizedException(message: 'Unauthorized access');
+    } else if (response.statusCode == 403) {
+      throw ForbiddenException(message: 'Access forbidden');
     } else {
-      throw ServerException();
+      throw ServerException(message: 'Server error occurred');
     }
   }
 
   @override
-  Future<ProductModel> getProduct(String id) async {
-    try {
-      // Simulate API delay
-      await Future.delayed(const Duration(milliseconds: 500));
+  Future<ProductModel> getProduct(String id, {String? token}) async {
+    final response = await client.get(
+      Uri.parse('$baseUrl/products/$id'),
+      headers: _getHeaders(token),
+    );
 
-      // Mock successful response
-      if (id == '1') {
-        return ProductModel(
-          id: '1',
-          name: 'Mock Product',
-          description: 'A mock product for testing',
-          price: 99.99,
-          imageUrl: 'mock.jpg',
-          category: 'Test',
-          rating: 4.5,
-        );
-      } else {
-        throw ServerException();
-      }
-    } catch (e) {
-      throw ServerException();
+    if (response.statusCode == 200) {
+      final jsonMap = json.decode(response.body);
+      return ProductModel.fromJson(jsonMap['data']);
+    } else if (response.statusCode == 401) {
+      throw UnauthorizedException(message: 'Unauthorized access');
+    } else if (response.statusCode == 403) {
+      throw ForbiddenException(message: 'Access forbidden');
+    } else {
+      throw ServerException(message: 'Server error occurred');
     }
   }
 
   @override
-  Future<void> createProduct(ProductModel product) async {
-    try {
-      final response = await client.post(
-        Uri.parse('$baseUrl/products'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(product.toJson()),
-      );
+  Future<ProductModel> createProduct(ProductModel product, {String? token}) async {
+    // Create form data for multipart request
+    var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/products'));
+    
+    // Add auth header if token provided
+    if (token != null) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
 
-      if (response.statusCode != 201 && response.statusCode != 200) {
-        throw ServerException();
+    // Add form fields
+    request.fields['name'] = product.name;
+    request.fields['description'] = product.description;
+    request.fields['price'] = product.price.toString();
+    
+    // Add image file if a local path is provided
+    if (product.imageUrl.isNotEmpty) {
+      final file = File(product.imageUrl);
+      if (await file.exists()) {
+        request.files.add(await http.MultipartFile.fromPath('image', file.path));
       }
-    } catch (e) {
-      throw ServerException();
+    }
+
+    final streamedResponse = await client.send(request);
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode == 201) {
+      final jsonMap = json.decode(response.body);
+      return ProductModel.fromJson(jsonMap['data']);
+    } else if (response.statusCode == 401) {
+      throw UnauthorizedException(message: 'Unauthorized access');
+    } else if (response.statusCode == 403) {
+      throw ForbiddenException(message: 'Access forbidden');
+    } else {
+      throw ServerException(message: 'Server error occurred');
     }
   }
 
   @override
-  Future<void> updateProduct(ProductModel product) async {
-    try {
-      // Simulate API delay
-      await Future.delayed(const Duration(milliseconds: 500));
+  Future<ProductModel> updateProduct(String id, ProductModel product, {String? token}) async {
+    if (id.isEmpty) {
+      throw ServerException(message: 'Product ID cannot be empty');
+    }
+    final response = await client.put(
+      Uri.parse('$baseUrl/products/$id'),
+      headers: _getHeaders(token),
+      body: json.encode(product.toJson()),
+    );
 
-      // Mock successful update
-      if (product.id.isNotEmpty) {
-        return;
-      } else {
-        throw ServerException();
-      }
-    } catch (e) {
-      throw ServerException();
+    if (response.statusCode == 200) {
+      final jsonMap = json.decode(response.body);
+      return ProductModel.fromJson(jsonMap['data']);
+    } else if (response.statusCode == 401) {
+      throw UnauthorizedException(message: 'Unauthorized access');
+    } else if (response.statusCode == 403) {
+      throw ForbiddenException(message: 'Access forbidden');
+    } else {
+      throw ServerException(message: 'Server error occurred');
     }
   }
 
   @override
-  Future<void> deleteProduct(String id) async {
-    try {
-      // Simulate API delay
-      await Future.delayed(const Duration(milliseconds: 500));
+  Future<void> deleteProduct(String id, {String? token}) async {
+    if (id.isEmpty) {
+      throw ServerException(message: 'Product ID cannot be empty');
+    }
+    final response = await client.delete(
+      Uri.parse('$baseUrl/products/$id'),
+      headers: _getHeaders(token),
+    );
 
-      // Mock successful deletion
-      if (id.isNotEmpty) {
-        return;
-      } else {
-        throw ServerException();
-      }
-    } catch (e) {
-      throw ServerException();
+    if (response.statusCode == 204) {
+      return;
+    } else if (response.statusCode == 401) {
+      throw UnauthorizedException(message: 'Unauthorized access');
+    } else if (response.statusCode == 403) {
+      throw ForbiddenException(message: 'Access forbidden');
+    } else {
+      throw ServerException(message: 'Server error occurred');
     }
   }
 }

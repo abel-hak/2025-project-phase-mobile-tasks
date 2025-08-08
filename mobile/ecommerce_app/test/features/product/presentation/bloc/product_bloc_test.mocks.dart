@@ -28,8 +28,13 @@ import 'package:product_app/features/product/domain/repositories/product_reposit
 // ignore_for_file: subtype_of_sealed_class
 
 class _FakeEither_0<L, R> extends _i1.SmartFake implements _i2.Either<L, R> {
-  _FakeEither_0(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
+  _FakeEither_0(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
 }
 
 /// A class which mocks [ProductRepository].
@@ -41,72 +46,111 @@ class MockProductRepository extends _i1.Mock implements _i3.ProductRepository {
   }
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, List<_i6.Product>>> getAllProducts() =>
+  _i4.Future<_i2.Either<_i5.Failure, List<_i6.Product>>> getAllProducts(
+          {required String? token}) =>
       (super.noSuchMethod(
-            Invocation.method(#getAllProducts, []),
-            returnValue:
-                _i4.Future<_i2.Either<_i5.Failure, List<_i6.Product>>>.value(
-                  _FakeEither_0<_i5.Failure, List<_i6.Product>>(
-                    this,
-                    Invocation.method(#getAllProducts, []),
-                  ),
-                ),
-          )
-          as _i4.Future<_i2.Either<_i5.Failure, List<_i6.Product>>>);
+        Invocation.method(
+          #getAllProducts,
+          [],
+          {#token: token},
+        ),
+        returnValue:
+            _i4.Future<_i2.Either<_i5.Failure, List<_i6.Product>>>.value(
+                _FakeEither_0<_i5.Failure, List<_i6.Product>>(
+          this,
+          Invocation.method(
+            #getAllProducts,
+            [],
+            {#token: token},
+          ),
+        )),
+      ) as _i4.Future<_i2.Either<_i5.Failure, List<_i6.Product>>>);
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, _i6.Product>> getProduct(String? id) =>
+  _i4.Future<_i2.Either<_i5.Failure, _i6.Product>> getProduct(
+    String? id, {
+    required String? token,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#getProduct, [id]),
-            returnValue: _i4.Future<_i2.Either<_i5.Failure, _i6.Product>>.value(
-              _FakeEither_0<_i5.Failure, _i6.Product>(
-                this,
-                Invocation.method(#getProduct, [id]),
-              ),
-            ),
-          )
-          as _i4.Future<_i2.Either<_i5.Failure, _i6.Product>>);
+        Invocation.method(
+          #getProduct,
+          [id],
+          {#token: token},
+        ),
+        returnValue: _i4.Future<_i2.Either<_i5.Failure, _i6.Product>>.value(
+            _FakeEither_0<_i5.Failure, _i6.Product>(
+          this,
+          Invocation.method(
+            #getProduct,
+            [id],
+            {#token: token},
+          ),
+        )),
+      ) as _i4.Future<_i2.Either<_i5.Failure, _i6.Product>>);
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, void>> createProduct(
-    _i6.Product? product,
-  ) =>
+  _i4.Future<_i2.Either<_i5.Failure, _i6.Product>> createProduct(
+    _i6.Product? product, {
+    required String? token,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#createProduct, [product]),
-            returnValue: _i4.Future<_i2.Either<_i5.Failure, void>>.value(
-              _FakeEither_0<_i5.Failure, void>(
-                this,
-                Invocation.method(#createProduct, [product]),
-              ),
-            ),
-          )
-          as _i4.Future<_i2.Either<_i5.Failure, void>>);
+        Invocation.method(
+          #createProduct,
+          [product],
+          {#token: token},
+        ),
+        returnValue: _i4.Future<_i2.Either<_i5.Failure, _i6.Product>>.value(
+            _FakeEither_0<_i5.Failure, _i6.Product>(
+          this,
+          Invocation.method(
+            #createProduct,
+            [product],
+            {#token: token},
+          ),
+        )),
+      ) as _i4.Future<_i2.Either<_i5.Failure, _i6.Product>>);
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, void>> updateProduct(
-    _i6.Product? product,
-  ) =>
+  _i4.Future<_i2.Either<_i5.Failure, _i6.Product>> updateProduct(
+    _i6.Product? product, {
+    required String? token,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#updateProduct, [product]),
-            returnValue: _i4.Future<_i2.Either<_i5.Failure, void>>.value(
-              _FakeEither_0<_i5.Failure, void>(
-                this,
-                Invocation.method(#updateProduct, [product]),
-              ),
-            ),
-          )
-          as _i4.Future<_i2.Either<_i5.Failure, void>>);
+        Invocation.method(
+          #updateProduct,
+          [product],
+          {#token: token},
+        ),
+        returnValue: _i4.Future<_i2.Either<_i5.Failure, _i6.Product>>.value(
+            _FakeEither_0<_i5.Failure, _i6.Product>(
+          this,
+          Invocation.method(
+            #updateProduct,
+            [product],
+            {#token: token},
+          ),
+        )),
+      ) as _i4.Future<_i2.Either<_i5.Failure, _i6.Product>>);
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, void>> deleteProduct(String? id) =>
+  _i4.Future<_i2.Either<_i5.Failure, void>> deleteProduct(
+    String? id, {
+    required String? token,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#deleteProduct, [id]),
-            returnValue: _i4.Future<_i2.Either<_i5.Failure, void>>.value(
-              _FakeEither_0<_i5.Failure, void>(
-                this,
-                Invocation.method(#deleteProduct, [id]),
-              ),
-            ),
-          )
-          as _i4.Future<_i2.Either<_i5.Failure, void>>);
+        Invocation.method(
+          #deleteProduct,
+          [id],
+          {#token: token},
+        ),
+        returnValue: _i4.Future<_i2.Either<_i5.Failure, void>>.value(
+            _FakeEither_0<_i5.Failure, void>(
+          this,
+          Invocation.method(
+            #deleteProduct,
+            [id],
+            {#token: token},
+          ),
+        )),
+      ) as _i4.Future<_i2.Either<_i5.Failure, void>>);
 }

@@ -8,7 +8,7 @@ class GetAllProducts {
 
   GetAllProducts(this.repository);
 
-  Future<Either<Failure, List<Product>>> call() async {
-    return await repository.getAllProducts();
+  Future<Either<Failure, List<Product>>> call({required String token}) async {
+    return await repository.getAllProducts(token: token);
   }
 }

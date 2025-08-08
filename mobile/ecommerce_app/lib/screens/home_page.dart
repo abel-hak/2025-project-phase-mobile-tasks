@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../config/routes.dart';
 import '../models/product.dart';
+import '../features/auth/presentation/bloc/auth_bloc.dart';
+import '../features/auth/presentation/bloc/auth_state.dart';
 
 class HomePage extends StatefulWidget {
+  static const routeName = '/home';
+
   const HomePage({super.key});
 
   @override
@@ -43,9 +48,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Access AuthBloc to get logged-in user's name
+    String userName = 'User';
+    final authState = context.watch<AuthBloc>().state;
+    if (authState is AuthAuthenticated) {
+      userName = authState.auth.name;
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xfff7f7f7),
-
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -58,7 +69,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Row(
                     children: [
-                      CircleAvatar(
+                      const CircleAvatar(
                         radius: 20,
                         backgroundColor: Colors.grey,
                       ),
@@ -68,11 +79,12 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Text(
                             'July 14, 2023',
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.grey),
                           ),
                           Text(
-                            'Hello, Yohannes',
-                            style: TextStyle(
+                            'Hello, $userName',
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -81,31 +93,27 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   ),
-                  Row(
-                    children: [
-                      Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withValues(alpha: 0.1),
-                              spreadRadius: 1,
-                              blurRadius: 1,
-                            ),
-                          ],
+                  Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 1,
                         ),
-                        child: IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.notifications_none_rounded,
-                            color: Colors.grey,
-                          ),
-                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.notifications_none_rounded,
+                        color: Colors.grey,
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -128,7 +136,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withValues(alpha: 0.1),
+                          color: Colors.grey.withOpacity(0.1),
                           spreadRadius: 1,
                           blurRadius: 1,
                         ),
@@ -210,7 +218,6 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ],
                                     ),
-
                                     const SizedBox(height: 4),
                                     Row(
                                       mainAxisAlignment:

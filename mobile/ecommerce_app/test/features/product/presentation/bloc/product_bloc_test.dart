@@ -66,9 +66,7 @@ void main() {
     test(
       'should emit [LoadingState, LoadedAllProductState] when successful',
       () {
-        when(
-          mockRepository.getAllProducts(),
-        ).thenAnswer((_) async => Right(products));
+        when(mockRepository.getAllProducts(token: 'test-token')).thenAnswer((_) async => Right(products));
 
         final expected = [
           const LoadingState(),
@@ -76,19 +74,17 @@ void main() {
         ];
 
         expectLater(bloc.stream, emitsInOrder(expected));
-        bloc.add(const LoadAllProductEvent());
+        bloc.add(const LoadAllProductEvent(token: 'test-token'));
       },
     );
 
     test('should emit [LoadingState, ErrorState] when unsuccessful', () {
-      when(
-        mockRepository.getAllProducts(),
-      ).thenAnswer((_) async => Left(ServerFailure()));
+      when(mockRepository.getAllProducts(token: 'test-token')).thenAnswer((_) async => Left(ServerFailure(message: 'Server error occurred')));
 
       final expected = [const LoadingState(), isA<ErrorState>()];
 
       expectLater(bloc.stream, emitsInOrder(expected));
-      bloc.add(const LoadAllProductEvent());
+      bloc.add(const LoadAllProductEvent(token: 'test-token'));
     });
   });
 
@@ -106,9 +102,7 @@ void main() {
     test(
       'should emit [LoadingState, LoadedSingleProductState] when successful',
       () {
-        when(
-          mockRepository.getProduct('1'),
-        ).thenAnswer((_) async => Right(product));
+        when(mockRepository.getProduct('1', token: 'test-token')).thenAnswer((_) async => Right(product));
 
         final expected = [
           const LoadingState(),
@@ -116,19 +110,17 @@ void main() {
         ];
 
         expectLater(bloc.stream, emitsInOrder(expected));
-        bloc.add(const GetSingleProductEvent(id: '1'));
+        bloc.add(GetSingleProductEvent(id: '1', token: 'test-token'));
       },
     );
 
     test('should emit [LoadingState, ErrorState] when unsuccessful', () {
-      when(
-        mockRepository.getProduct('1'),
-      ).thenAnswer((_) async => Left(ServerFailure()));
+      when(mockRepository.getProduct('1', token: 'test-token')).thenAnswer((_) async => Left(ServerFailure(message: 'Server error occurred')));
 
       final expected = [const LoadingState(), isA<ErrorState>()];
 
       expectLater(bloc.stream, emitsInOrder(expected));
-      bloc.add(const GetSingleProductEvent(id: '1'));
+      bloc.add(GetSingleProductEvent(id: '1', token: 'test-token'));
     });
   });
 
@@ -146,12 +138,8 @@ void main() {
     test(
       'should emit [LoadingState] and call LoadAllProductEvent when successful',
       () {
-        when(
-          mockRepository.createProduct(product),
-        ).thenAnswer((_) async => const Right(null));
-        when(
-          mockRepository.getAllProducts(),
-        ).thenAnswer((_) async => Right([]));
+        when(mockRepository.createProduct(product, token: 'test-token')).thenAnswer((_) async => Right(product));
+        when(mockRepository.getAllProducts(token: 'test-token')).thenAnswer((_) async => Right([]));
 
         final expected = [
           const LoadingState(),
@@ -159,19 +147,17 @@ void main() {
         ];
 
         expectLater(bloc.stream, emitsInOrder(expected));
-        bloc.add(CreateProductEvent(product: product));
+        bloc.add(CreateProductEvent(product: product, token: 'test-token'));
       },
     );
 
     test('should emit [LoadingState, ErrorState] when unsuccessful', () {
-      when(
-        mockRepository.createProduct(product),
-      ).thenAnswer((_) async => Left(ServerFailure()));
+      when(mockRepository.createProduct(product, token: 'test-token')).thenAnswer((_) async => Left(ServerFailure(message: 'Server error occurred')));
 
       final expected = [const LoadingState(), isA<ErrorState>()];
 
       expectLater(bloc.stream, emitsInOrder(expected));
-      bloc.add(CreateProductEvent(product: product));
+      bloc.add(CreateProductEvent(product: product, token: 'test-token'));
     });
   });
 
@@ -189,12 +175,8 @@ void main() {
     test(
       'should emit [LoadingState] and call LoadAllProductEvent when successful',
       () {
-        when(
-          mockRepository.updateProduct(product),
-        ).thenAnswer((_) async => const Right(null));
-        when(
-          mockRepository.getAllProducts(),
-        ).thenAnswer((_) async => Right([]));
+        when(mockRepository.updateProduct(product, token: 'test-token')).thenAnswer((_) async => Right(product));
+        when(mockRepository.getAllProducts(token: 'test-token')).thenAnswer((_) async => Right([]));
 
         final expected = [
           const LoadingState(),
@@ -202,19 +184,17 @@ void main() {
         ];
 
         expectLater(bloc.stream, emitsInOrder(expected));
-        bloc.add(UpdateProductEvent(product: product));
+        bloc.add(UpdateProductEvent(product: product, token: 'test-token'));
       },
     );
 
     test('should emit [LoadingState, ErrorState] when unsuccessful', () {
-      when(
-        mockRepository.updateProduct(product),
-      ).thenAnswer((_) async => Left(ServerFailure()));
+      when(mockRepository.updateProduct(product, token: 'test-token')).thenAnswer((_) async => Left(ServerFailure(message: 'Server error occurred')));
 
       final expected = [const LoadingState(), isA<ErrorState>()];
 
       expectLater(bloc.stream, emitsInOrder(expected));
-      bloc.add(UpdateProductEvent(product: product));
+      bloc.add(UpdateProductEvent(product: product, token: 'test-token'));
     });
   });
 
@@ -222,12 +202,8 @@ void main() {
     test(
       'should emit [LoadingState] and call LoadAllProductEvent when successful',
       () {
-        when(
-          mockRepository.deleteProduct('1'),
-        ).thenAnswer((_) async => const Right(null));
-        when(
-          mockRepository.getAllProducts(),
-        ).thenAnswer((_) async => Right([]));
+        when(mockRepository.deleteProduct('1', token: 'test-token')).thenAnswer((_) async => const Right(null));
+        when(mockRepository.getAllProducts(token: 'test-token')).thenAnswer((_) async => Right([]));
 
         final expected = [
           const LoadingState(),
@@ -235,19 +211,17 @@ void main() {
         ];
 
         expectLater(bloc.stream, emitsInOrder(expected));
-        bloc.add(const DeleteProductEvent(id: '1'));
+        bloc.add(DeleteProductEvent(id: '1', token: 'test-token'));
       },
     );
 
     test('should emit [LoadingState, ErrorState] when unsuccessful', () {
-      when(
-        mockRepository.deleteProduct('1'),
-      ).thenAnswer((_) async => Left(ServerFailure()));
+      when(mockRepository.deleteProduct('1', token: 'test-token')).thenAnswer((_) async => Left(ServerFailure(message: 'Server error occurred')));
 
       final expected = [const LoadingState(), isA<ErrorState>()];
 
       expectLater(bloc.stream, emitsInOrder(expected));
-      bloc.add(const DeleteProductEvent(id: '1'));
+      bloc.add(DeleteProductEvent(id: '1', token: 'test-token'));
     });
   });
 }

@@ -8,7 +8,10 @@ import '../datasources/product_local_data_source.dart';
 import '../datasources/product_remote_data_source.dart';
 import '../models/product_model.dart';
 
+typedef AuthTokenProvider = Future<String?> Function();
+
 class ProductRepositoryImpl implements ProductRepository {
+  final AuthTokenProvider getToken;
   final ProductRemoteDataSource remoteDataSource;
   final ProductLocalDataSource localDataSource;
   final NetworkInfo networkInfo;
@@ -17,73 +20,108 @@ class ProductRepositoryImpl implements ProductRepository {
     required this.remoteDataSource,
     required this.localDataSource,
     required this.networkInfo,
+    required this.getToken,
   });
 
   @override
-  Future<Either<Failure, void>> deleteProduct(String id) async {
+  Future<Either<Failure, void>> deleteProduct(String id, {required String token}) async {
     try {
       if (await networkInfo.isConnected) {
-        await remoteDataSource.deleteProduct(id);
+        await remoteDataSource.deleteProduct(id, token: token);
         await localDataSource.removeCachedProduct(id);
         return const Right(null);
       } else {
         await localDataSource.removeCachedProduct(id);
         return const Right(null);
       }
+    } on UnauthorizedException {
+      return Left(UnauthorizedFailure(message: 'Unauthorized access'));
+    } on ForbiddenException {
+      return Left(ForbiddenFailure(message: 'Access forbidden'));
     } on ServerException {
-      return Left(ServerFailure());
+      return Left(ServerFailure(message: 'Server error occurred'));
     } on CacheException {
-      return Left(CacheFailure());
+      return Left(CacheFailure(message: 'Cache operation failed'));
     }
   }
 
   @override
-  Future<Either<Failure, List<Product>>> getAllProducts() async {
-    if (await networkInfo.isConnected) {
-      try {
-        final remoteProducts = await remoteDataSource.getAllProducts();
+  Future<Either<Failure, List<Product>>> getAllProducts({required String token}) async {
+    try {
+      if (await networkInfo.isConnected) {
+        final remoteProducts = await remoteDataSource.getAllProducts(token: token);
         await localDataSource.cacheProducts(remoteProducts);
         return Right(remoteProducts);
-      } on ServerException {
-        return Left(ServerFailure());
-      }
-    } else {
-      try {
+      } else {
         final localProducts = await localDataSource.getCachedProducts();
         return Right(localProducts);
-      } on CacheException {
-        return Left(CacheFailure());
       }
+    } on UnauthorizedException {
+      return Left(UnauthorizedFailure(message: 'Unauthorized access'));
+    } on ForbiddenException {
+      return Left(ForbiddenFailure(message: 'Access forbidden'));
+    } on ServerException {
+      return Left(ServerFailure(message: 'Server error occurred'));
     }
   }
 
   @override
-  Future<Either<Failure, Product>> getProduct(String id) async {
+  Future<Either<Failure, Product>> getProduct(String id, {required String token}) async {
     if (await networkInfo.isConnected) {
       try {
-        final remoteProduct = await remoteDataSource.getProduct(id);
+        final remoteProduct = await remoteDataSource.getProduct(id, token: token);
         await localDataSource.cacheProduct(remoteProduct);
         return Right(remoteProduct);
+      } on UnauthorizedException {
+        return Left(UnauthorizedFailure(message: 'Unauthorized access'));
+      } on ForbiddenException {
+        return Left(ForbiddenFailure(message: 'Access forbidden'));
       } on ServerException {
-        try {
-          final localProduct = await localDataSource.getCachedProduct(id);
-          return Right(localProduct);
-        } on CacheException {
-          return Left(CacheFailure());
-        }
+        return Left(ServerFailure(message: 'Server error occurred'));
       }
     } else {
       try {
         final localProduct = await localDataSource.getCachedProduct(id);
         return Right(localProduct);
       } on CacheException {
-        return Left(CacheFailure());
+        return Left(CacheFailure(message: 'Cache operation failed'));
       }
     }
   }
 
   @override
-  Future<Either<Failure, void>> createProduct(Product product) async {
+  Future<Either<Failure, Product>> createProduct(Product product, {required String token}) async {
+    try {
+      if (await networkInfo.isConnected) {
+        final productModel = ProductModel(
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          imageUrl: product.imageUrl,
+          category: product.category,
+          rating: product.rating,
+        );
+        final createdProduct = await remoteDataSource.createProduct(
+          productModel,
+          token: token,
+        );
+        await localDataSource.cacheProduct(createdProduct);
+        return Right(createdProduct);
+      } else {
+        return Left(NoInternetFailure(message: 'No internet connection'));
+      }
+    } on UnauthorizedException {
+      return Left(UnauthorizedFailure(message: 'Unauthorized access'));
+    } on ForbiddenException {
+      return Left(ForbiddenFailure(message: 'Access forbidden'));
+    } on ServerException {
+      return Left(ServerFailure(message: 'Server error occurred'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Product>> updateProduct(Product product, {required String token}) async {
     final productModel = ProductModel(
       id: product.id,
       name: product.name,
@@ -94,44 +132,22 @@ class ProductRepositoryImpl implements ProductRepository {
       rating: product.rating,
     );
 
-    if (await networkInfo.isConnected) {
-      try {
-        await remoteDataSource.createProduct(productModel);
-        await localDataSource.cacheProduct(productModel);
-        return const Right(null);
-      } on ServerException {
-        return Left(ServerFailure());
-      }
-    } else {
-      throw ServerException();
-    }
-  }
-
-  @override
-  Future<Either<Failure, void>> updateProduct(Product product) async {
     try {
-      final productModel = ProductModel(
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        imageUrl: product.imageUrl,
-        category: product.category,
-        rating: product.rating,
-      );
-      
       if (await networkInfo.isConnected) {
-        await remoteDataSource.updateProduct(productModel);
-        await localDataSource.updateCachedProduct(productModel);
-        return const Right(null);
+        final updatedProduct = await remoteDataSource.updateProduct(product.id, productModel, token: token);
+        await localDataSource.cacheProduct(updatedProduct);
+        return Right(updatedProduct);
       } else {
-        await localDataSource.updateCachedProduct(productModel);
-        return const Right(null);
+        return Left(NoInternetFailure(message: 'No internet connection'));
       }
+    } on UnauthorizedException {
+      return Left(UnauthorizedFailure(message: 'Unauthorized access'));
+    } on ForbiddenException {
+      return Left(ForbiddenFailure(message: 'Access forbidden'));
     } on ServerException {
-      return Left(ServerFailure());
+      return Left(ServerFailure(message: 'Server error occurred'));
     } on CacheException {
-      return Left(CacheFailure());
+      return Left(CacheFailure(message: 'Cache operation failed'));
     }
   }
 }

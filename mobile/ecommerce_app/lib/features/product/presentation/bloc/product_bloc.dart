@@ -33,7 +33,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     Emitter<ProductState> emit,
   ) async {
     emit(const LoadingState());
-    final result = await getAllProducts();
+    final result = await getAllProducts(token: event.token);
     result.fold(
       (failure) => emit(ErrorState(message: failure.toString())),
       (products) => emit(LoadedAllProductState(products: products)),
@@ -45,7 +45,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     Emitter<ProductState> emit,
   ) async {
     emit(const LoadingState());
-    final result = await getProduct(event.id);
+    final result = await getProduct(event.id, token: event.token);
     result.fold(
       (failure) => emit(ErrorState(message: failure.toString())),
       (product) => emit(LoadedSingleProductState(product: product)),
@@ -57,10 +57,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     Emitter<ProductState> emit,
   ) async {
     emit(const LoadingState());
-    final result = await createProduct(event.product);
+    final result = await createProduct(event.product, token: event.token);
     result.fold(
       (failure) => emit(ErrorState(message: failure.toString())),
-      (_) => add(const LoadAllProductEvent()), // Reload products after creation
+      (_) => add(LoadAllProductEvent(token: event.token)), // Reload products after creation
     );
   }
 
@@ -69,10 +69,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     Emitter<ProductState> emit,
   ) async {
     emit(const LoadingState());
-    final result = await updateProduct(event.product);
+    final result = await updateProduct(event.product, token: event.token);
     result.fold(
       (failure) => emit(ErrorState(message: failure.toString())),
-      (_) => add(const LoadAllProductEvent()), // Reload products after update
+      (_) => add(LoadAllProductEvent(token: event.token)), // Reload products after update
     );
   }
 
@@ -81,10 +81,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     Emitter<ProductState> emit,
   ) async {
     emit(const LoadingState());
-    final result = await deleteProduct(event.id);
+    final result = await deleteProduct(event.id, token: event.token);
     result.fold(
       (failure) => emit(ErrorState(message: failure.toString())),
-      (_) => add(const LoadAllProductEvent()), // Reload products after deletion
+      (_) => add(LoadAllProductEvent(token: event.token)), // Reload products after deletion
     );
   }
 }

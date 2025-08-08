@@ -1,0 +1,94 @@
+{
+  "users": [
+    {
+      "id": "03eb",
+      "name": "Test User",
+      "email": "test@example.com",
+      "password": "password123"
+    },
+    {
+      "id": "7f46",
+      "name": "Test User",
+      "email": "test2@example.com",
+      "password": "password123"
+    },
+    {
+      "id": "0dff",
+      "name": "Test User Direct",
+      "email": "testdirect@example.com",
+      "password": "password123"
+    },
+    {
+      "id": "4cec",
+      "name": "Full Flow Test",
+      "email": "fullflow@example.com",
+      "password": "password123"
+    },
+    {
+      "id": "1493",
+      "name": "Test User Direct",
+      "email": "testdirect@example.com",
+      "password": "password123"
+    },
+    {
+      "id": "89b3",
+      "name": "Test User Direct",
+      "email": "testdirect@example.com",
+      "password": "password123"
+    },
+    {
+      "id": "7ba1",
+      "name": "Full Flow Test",
+      "email": "fullflow@example.com",
+      "password": "password123"
+    },
+    {
+      "id": "0988",
+      "name": "Debug Flow User",
+      "email": "debugflow@example.com",
+      "password": "password123"
+    }
+  ],
+  "tokens": [
+    {
+      "id": "1",
+      "email": "test@example.com",
+      "token": "mock_token_12345"
+    },
+    {
+      "id": "b437",
+      "email": "test@example.com",
+      "token": "mock_token_123"
+    },
+    {
+      "id": "4181",
+      "email": "test2@example.com",
+      "token": "mock_token_123"
+    },
+    {
+      "id": "7473",
+      "email": "testdirect@example.com",
+      "token": "mock_token_1754490269937"
+    },
+    {
+      "id": "2dd7",
+      "email": "fullflow@example.com",
+      "token": "mock_token_1754490454365"
+    },
+    {
+      "id": "fc4c",
+      "email": "testdirect@example.com",
+      "token": "mock_token_1754490499540"
+    },
+    {
+      "id": "0570",
+      "email": "fullflow@example.com",
+      "token": "mock_token_1754490511969"
+    },
+    {
+      "id": "6c00",
+      "email": "debugflow@example.com",
+      "token": "mock_token_1754490807829"
+    }
+  ]
+}

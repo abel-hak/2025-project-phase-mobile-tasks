@@ -53,7 +53,11 @@ void main() {
       // act
       final call = dataSource.getCachedProduct;
       // assert
-      expect(() => call(tId), throwsA(isA<CacheException>()));
+      expect(() => call(tId), throwsA(isA<CacheException>().having(
+            (e) => e.message,
+            'message',
+            'Failed to cache the product',
+          )));
     });
   });
 
@@ -89,7 +93,11 @@ void main() {
       // act
       final call = dataSource.cacheProduct;
       // assert
-      expect(() => call(tProductModel), throwsA(isA<CacheException>()));
+      expect(() => call(tProductModel), throwsA(isA<CacheException>().having(
+            (e) => e.message,
+            'message',
+            'Failed to cache the product',
+          )));
     });
   });
 
@@ -125,7 +133,11 @@ void main() {
       // act
       final call = dataSource.updateCachedProduct;
       // assert
-      expect(() => call(tProductModel), throwsA(isA<CacheException>()));
+      expect(() => call(tProductModel), throwsA(isA<CacheException>().having(
+            (e) => e.message,
+            'message',
+            'Failed to cache the product',
+          )));
     });
   });
 
@@ -148,7 +160,11 @@ void main() {
       // act
       final call = dataSource.removeCachedProduct;
       // assert
-      expect(() => call(tId), throwsA(isA<CacheException>()));
+      expect(() => call(tId), throwsA(isA<CacheException>().having(
+            (e) => e.message,
+            'message',
+            'Failed to cache the product',
+          )));
     });
 
     test('should throw CacheException when remove fails', () async {
@@ -158,7 +174,11 @@ void main() {
       // act
       final call = dataSource.removeCachedProduct;
       // assert
-      expect(() => call(tId), throwsA(isA<CacheException>()));
+      expect(() => call(tId), throwsA(isA<CacheException>().having(
+            (e) => e.message,
+            'message',
+            'Failed to cache the product',
+          )));
     });
   });
 }

@@ -18,6 +18,11 @@ Detailed breakdown of the implementation:
   - category (String)
   - rating (double)
 
+- `Auth`: Authentication entity with properties:
+  - token (String)
+  - userId (String)
+  - email (String)
+
 #### Use Cases
 CRUD operations for products:
 - `InsertProductUseCase`: Add new products
@@ -25,12 +30,89 @@ CRUD operations for products:
 - `DeleteProductUseCase`: Remove products
 - `GetProductUseCase`: Retrieve product details
 
+Authentication operations:
+- `SignUpUseCase`: Register new users
+- `SignInUseCase`: Authenticate existing users
+- `SignOutUseCase`: Log out users
+
 #### Repository Interfaces
 - `ProductRepository`: Defines contract for product data operations
   - insertProduct
   - updateProduct
   - deleteProduct
   - getProduct
+
+- `AuthRepository`: Defines contract for authentication operations
+  - signUp
+  - signIn
+  - signOut
+
+### Auth Implementation
+
+#### BLoC Pattern
+The auth module uses the BLoC (Business Logic Component) pattern for state management:
+
+- **Events**:
+  - `SignUpEvent`: Trigger user registration
+  - `SignInEvent`: Trigger user authentication
+  - `SignOutEvent`: Trigger user logout
+
+- **States**:
+  - `AuthInitial`: Initial authentication state
+  - `AuthLoading`: During authentication operations
+  - `Authenticated`: User is authenticated
+  - `Unauthenticated`: User is not authenticated
+  - `AuthError`: Authentication error occurred
+
+#### Data Flow
+1. UI triggers auth events (sign up, sign in, sign out)
+2. AuthBloc handles events and calls appropriate use cases
+3. Use cases interact with AuthRepository
+4. Repository implements the data layer logic
+5. Remote data source handles API calls
+6. State updates propagate back to UI
+
+#### Testing
+Comprehensive test coverage across layers:
+- Unit tests for use cases (SignUp, SignIn, SignOut)
+- BLoC tests verifying state transitions
+- Repository tests with mock data sources
+- Integration tests for data flow
+
+#### Dependency Injection
+Using `get_it` for service locator pattern:
+
+```dart
+// Bloc
+sl.registerFactory(() => AuthBloc(
+  signUp: sl(),
+  signIn: sl(),
+  signOut: sl(),
+));
+
+// Use cases
+sl.registerLazySingleton(() => SignUp(sl()));
+sl.registerLazySingleton(() => SignIn(sl()));
+sl.registerLazySingleton(() => SignOut(sl()));
+
+// Repository
+sl.registerLazySingleton<AuthRepository>(
+  () => AuthRepositoryImpl(
+    remoteDataSource: sl(),
+    networkInfo: sl(),
+  ),
+);
+
+// Data sources
+sl.registerLazySingleton<AuthRemoteDataSource>(
+  () => AuthRemoteDataSourceImpl(
+    client: sl(),
+    baseUrl: baseUrl,
+  ),
+);
+```
+
+This setup ensures proper dependency injection and separation of concerns across all layers of the auth module.
 
 #### Repository Layer
 
@@ -90,8 +172,14 @@ The app uses the `get_it` package for dependency injection to manage and provide
 #### 1. Presentation Layer
 - **BLoC Pattern**
   - Separates business logic from UI
-  - Events: LoadAllProduct, GetSingleProduct, UpdateProduct, DeleteProduct, CreateProduct
-  - States: Initial, Loading, LoadedAllProduct, LoadedSingleProduct, Error
+  - **Product BLoC**
+    - Events: LoadAllProduct, GetSingleProduct, UpdateProduct, DeleteProduct, CreateProduct
+    - States: Initial, Loading, LoadedAllProduct, LoadedSingleProduct, Error
+  - **Auth BLoC**
+    - Events: SignUp, SignIn, SignOut
+    - States: Initial, Loading, Authenticated, Unauthenticated, Error
+  - Clean, reusable UI components (AuthTextField, etc.)
+  - Modern, user-friendly authentication screens
   - Comprehensive unit tests for all events and states
 
 #### 2. Domain Layer
