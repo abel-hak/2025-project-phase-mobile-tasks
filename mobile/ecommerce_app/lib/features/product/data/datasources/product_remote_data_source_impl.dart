@@ -11,7 +11,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
   ProductRemoteDataSourceImpl({
     required this.client,
-    this.baseUrl = 'https://g5-flutter-learning-path-be.onrender.com/api/v2',
+    this.baseUrl = 'https://g5-flutter-learning-path-be-tvum.onrender.com/api/v2',
   });
 
   Map<String, String> _getHeaders(String? token) => {

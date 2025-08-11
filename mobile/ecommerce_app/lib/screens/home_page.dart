@@ -128,6 +128,12 @@ class _HomePageState extends State<HomePage> {
                     'Available Products',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, Routes.chatList);
+                    },
+                    child: const Text('Go to Chats'),
+                  ),
                   Container(
                     height: 40,
                     width: 40,

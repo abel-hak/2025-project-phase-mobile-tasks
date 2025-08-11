@@ -43,6 +43,7 @@ dependencies:
   equatable: ^2.0.5
   dartz: ^0.10.1
   get_it: ^7.6.7
+  socket_io_client: ^2.0.3+1
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +70,7 @@ flutter:
     - assets/images/Air-Jordan-1-Retro-High-Travis-Scott-Product.png
     - assets/images/puma.png
     - assets/images/travis.png
+    - assets/images/ecom_logo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

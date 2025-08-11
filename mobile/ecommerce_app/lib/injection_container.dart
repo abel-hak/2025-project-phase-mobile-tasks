@@ -2,6 +2,8 @@ import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'core/constants/api_constants.dart' as api;
 import 'core/network/network_info.dart';
 import 'features/auth/data/datasources/auth_remote_data_source.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
@@ -11,6 +13,17 @@ import 'features/auth/domain/usecases/sign_in.dart';
 import 'features/auth/domain/usecases/sign_out.dart';
 import 'features/auth/domain/usecases/sign_up.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/chat/data/datasources/chat_remote_data_source.dart';
+import 'features/chat/data/datasources/chat_socket_data_source.dart';
+import 'features/chat/data/repositories/chat_repository_impl.dart';
+import 'features/chat/domain/repositories/chat_repository.dart';
+import 'features/chat/domain/usecases/delete_chat.dart';
+import 'features/chat/domain/usecases/get_messages_for_chat.dart';
+import 'features/chat/domain/usecases/get_my_chats.dart';
+import 'features/chat/domain/usecases/initiate_chat.dart';
+import 'features/chat/presentation/bloc/chat_bloc.dart';
+import 'features/chat/presentation/bloc/chat_list_bloc/chat_list_bloc.dart';
+import 'features/chat/presentation/bloc/chat_messages/chat_messages_bloc.dart';
 import 'features/product/data/datasources/product_local_data_source.dart';
 import 'features/product/data/datasources/product_local_data_source_impl.dart';
 import 'features/product/data/datasources/product_remote_data_source.dart';
@@ -25,7 +38,11 @@ import 'features/product/domain/usecases/update_product.dart';
 import 'features/product/presentation/bloc/product_bloc.dart';
 
 final sl = GetIt.instance;
-const baseUrl = 'https://g5-flutter-learning-path-be-tvum.onrender.com/api/v2'; // Real API URL
+
+// API URLs
+const baseUrl = 'https://g5-flutter-learning-path-be-tvum.onrender.com/api/v2'; // Real API URL for products
+const chatBaseUrl = api.baseSocketUrl; // Use base URL for Socket.IO
+const chatApiUrl = api.baseApiUrl; // Use v3 API URL for chat HTTP endpoints
 
 Future<void> init() async {
   // Features - Auth
@@ -113,4 +130,51 @@ Future<void> init() async {
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => http.Client());
   sl.registerLazySingleton(() => InternetConnectionChecker());
+
+  // Features - Chat
+  // Bloc
+  sl.registerFactory(
+    () => ChatBloc(
+      chatRepository: sl(),
+      initiateChat: sl(),
+      deleteChat: sl(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => ChatListBloc(sl()),
+  );
+
+  sl.registerFactory(
+    () => ChatMessagesBloc(chatRepository: sl()),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => GetMyChats(sl()));
+  sl.registerLazySingleton(() => GetMessagesForChat(sl()));
+  sl.registerLazySingleton(() => InitiateChat(sl()));
+  sl.registerLazySingleton(() => DeleteChat(sl()));
+
+  // Repository
+  sl.registerLazySingleton<ChatRepository>(
+    () => ChatRepositoryImpl(
+      remoteDataSource: sl(),
+      socketDataSource: sl(),
+    ),
+  );
+
+  // Data sources
+  sl.registerLazySingleton<ChatRemoteDataSource>(
+    () => ChatRemoteDataSourceImpl(
+      client: sl(),
+      baseUrl: chatApiUrl, // Use v3 API URL for all chat HTTP endpoints
+    ),
+  );
+
+  sl.registerLazySingleton<ChatSocketDataSource>(
+    () => ChatSocketDataSourceImpl(
+      chatBaseUrl,
+      socketNamespace: api.socketNamespace,
+    ),
+  );
 }
