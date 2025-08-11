@@ -21,7 +21,6 @@ abstract class AuthRemoteDataSource {
     required String name,
   });
 
-  Future<void> signOut(String token);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -190,18 +189,5 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
   }
 
-  @override
-  Future<void> signOut(String token) async {
-    final response = await client.post(
-      Uri.parse('$baseUrl/auth/signout'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
 
-    if (response.statusCode != 200) {
-      throw ServerException(message: 'Failed to sign out');
-    }
-  }
 }

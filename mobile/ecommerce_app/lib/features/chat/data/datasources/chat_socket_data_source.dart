@@ -40,7 +40,8 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
 
   // Message controllers
   final _messageReceivedController = StreamController<MessageModel>.broadcast();
-  final _messageDeliveredController = StreamController<MessageModel>.broadcast();
+  final _messageDeliveredController =
+      StreamController<MessageModel>.broadcast();
   final _connectionController = StreamController<bool>.broadcast();
   final _pendingMessages = <MessageModel>[];
 

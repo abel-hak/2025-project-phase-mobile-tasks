@@ -41,7 +41,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (failure) async => emit(AuthError(failure.message)),
       (auth) async {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auth_token', auth.token);
+        await prefs.setString('token', auth.token);
         emit(AuthAuthenticated(auth));
       },
     );
@@ -75,7 +75,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           print('AuthBloc: Sign up successful, saving token');
           try {
             final prefs = await SharedPreferences.getInstance();
-            await prefs.setString('auth_token', auth.token);
+            await prefs.setString('token', auth.token);
             print('AuthBloc: Token saved, emitting AuthAuthenticated');
             if (!emit.isDone) emit(AuthAuthenticated(auth));
           } catch (e) {
@@ -100,7 +100,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (failure) async => emit(AuthError(failure.message)),
       (_) async {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.remove('auth_token');
+        await prefs.remove('token');
         emit(AuthUnauthenticated());
       },
     );

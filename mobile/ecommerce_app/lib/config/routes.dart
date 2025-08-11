@@ -38,8 +38,14 @@ class Routes {
           child: const SplashScreen(),
         );
       case home:
-        return SlidePageRoute(
-          child: const HomePage(),
+        return MaterialPageRoute(
+          builder: (context) {
+            final authState = context.read<AuthBloc>().state;
+            if (authState is! AuthAuthenticated) {
+              return const SignInScreen();
+            }
+            return const HomePage();
+          },
         );
       case signIn:
         return SlidePageRoute(

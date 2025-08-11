@@ -1,349 +1,40 @@
 # eCommerce Mobile App
 
-A Flutter-based mobile application for managing products, built using Clean Architecture principles and Test-Driven Development (TDD).
-
-## Implementation Details
-
-Detailed breakdown of the implementation:
-
-### Domain Layer
-
-#### Entities
-- `Product`: Core business entity with properties:
-  - id (String)
-  - name (String)
-  - description (String)
-  - price (double)
-  - imageUrl (String)
-  - category (String)
-  - rating (double)
-
-- `Auth`: Authentication entity with properties:
-  - token (String)
-  - userId (String)
-  - email (String)
-
-#### Use Cases
-CRUD operations for products:
-- `InsertProductUseCase`: Add new products
-- `UpdateProductUseCase`: Modify existing products
-- `DeleteProductUseCase`: Remove products
-- `GetProductUseCase`: Retrieve product details
-
-Authentication operations:
-- `SignUpUseCase`: Register new users
-- `SignInUseCase`: Authenticate existing users
-- `SignOutUseCase`: Log out users
-
-#### Repository Interfaces
-- `ProductRepository`: Defines contract for product data operations
-  - insertProduct
-  - updateProduct
-  - deleteProduct
-  - getProduct
-
-- `AuthRepository`: Defines contract for authentication operations
-  - signUp
-  - signIn
-  - signOut
-
-### Auth Implementation
-
-#### BLoC Pattern
-The auth module uses the BLoC (Business Logic Component) pattern for state management:
-
-- **Events**:
-  - `SignUpEvent`: Trigger user registration
-  - `SignInEvent`: Trigger user authentication
-  - `SignOutEvent`: Trigger user logout
-
-- **States**:
-  - `AuthInitial`: Initial authentication state
-  - `AuthLoading`: During authentication operations
-  - `Authenticated`: User is authenticated
-  - `Unauthenticated`: User is not authenticated
-  - `AuthError`: Authentication error occurred
-
-#### Data Flow
-1. UI triggers auth events (sign up, sign in, sign out)
-2. AuthBloc handles events and calls appropriate use cases
-3. Use cases interact with AuthRepository
-4. Repository implements the data layer logic
-5. Remote data source handles API calls
-6. State updates propagate back to UI
-
-#### Testing
-Comprehensive test coverage across layers:
-- Unit tests for use cases (SignUp, SignIn, SignOut)
-- BLoC tests verifying state transitions
-- Repository tests with mock data sources
-- Integration tests for data flow
-
-#### Dependency Injection
-Using `get_it` for service locator pattern:
-
-```dart
-// Bloc
-sl.registerFactory(() => AuthBloc(
-  signUp: sl(),
-  signIn: sl(),
-  signOut: sl(),
-));
-
-// Use cases
-sl.registerLazySingleton(() => SignUp(sl()));
-sl.registerLazySingleton(() => SignIn(sl()));
-sl.registerLazySingleton(() => SignOut(sl()));
-
-// Repository
-sl.registerLazySingleton<AuthRepository>(
-  () => AuthRepositoryImpl(
-    remoteDataSource: sl(),
-    networkInfo: sl(),
-  ),
-);
-
-// Data sources
-sl.registerLazySingleton<AuthRemoteDataSource>(
-  () => AuthRemoteDataSourceImpl(
-    client: sl(),
-    baseUrl: baseUrl,
-  ),
-);
-```
-
-This setup ensures proper dependency injection and separation of concerns across all layers of the auth module.
-
-#### Repository Layer
-
-The repository layer implements the domain layer contracts and coordinates data operations:
-
-1. **Network-Aware Repository**
-   - Uses NetworkInfo to check connectivity
-   - Remote data source when online
-   - Local data source when offline
-   - Automatic caching of remote data
-
-2. **Error Handling**
-   - Handles ServerException for remote operations
-   - Handles CacheException for local operations
-   - Falls back to cached data when remote fails
-
-3. **Data Sources**
-
-### Dependency Injection
-
-The app uses the `get_it` package for dependency injection to manage and provide dependencies throughout the application:
-
-1. **Service Locator**
-   - Centralized dependency container using `GetIt`
-   - Singleton instance accessible throughout the app
-
-2. **Dependency Registration**
-   - BLoC: Factory registration for new instances
-   - Use Cases: Lazy singletons
-   - Repository: Lazy singleton with implementations
-   - Data Sources: Lazy singletons with implementations
-   - External Dependencies: Shared preferences, HTTP client, network checker
-
-3. **Initialization**
-   - Asynchronous initialization for external dependencies
-   - Proper registration order respecting dependency chains
-   - Automated testing of dependency registration
-   - **Remote Data Source**:
-     - Implements ProductRemoteDataSource contract
-     - Mock API implementation (ready for real API integration)
-     - Proper error handling with ServerException
-     - Simulated network delays for testing
-     - Comprehensive test coverage for all operations
-   - **Local Data Source**:
-     - Uses SharedPreferences for caching
-     - JSON serialization/deserialization
-     - Proper error handling with CacheException
-
-4. **Testing**
-   - Comprehensive unit tests
-   - Mock-based testing using Mockito
-   - Tests for online/offline scenarios
-   - Tests for success and error cases
-
-### Architecture Overview
-
-#### 1. Presentation Layer
-- **BLoC Pattern**
-  - Separates business logic from UI
-  - **Product BLoC**
-    - Events: LoadAllProduct, GetSingleProduct, UpdateProduct, DeleteProduct, CreateProduct
-    - States: Initial, Loading, LoadedAllProduct, LoadedSingleProduct, Error
-  - **Auth BLoC**
-    - Events: SignUp, SignIn, SignOut
-    - States: Initial, Loading, Authenticated, Unauthenticated, Error
-  - Clean, reusable UI components (AuthTextField, etc.)
-  - Modern, user-friendly authentication screens
-  - Comprehensive unit tests for all events and states
-
-#### 2. Domain Layer
-- **Entities**
-  - `Product`: Core business entity
-  - Properties: id, name, description, price, imageUrl, category, rating
-
-- **Use Cases**
-  - CreateProductUseCase
-  - UpdateProductUseCase
-  - DeleteProductUseCase
-  - GetProductUseCase
-  - GetAllProductsUseCase
-
-- **Repository Contracts**
-  - ProductRepository interface defining data operations
-
-#### 3. Data Layer
-- **Models**
-  - `ProductModel`: Data representation of Product entity
-  - JSON serialization/deserialization
-  - Type conversion and equality implementations
-
-- **Repository Implementation**
-  - Network-aware with automatic offline fallback
-  - Coordinated remote/local data source usage
-  - Error handling with Either type from dartz
-
-- **Remote Data Source**
-  - Mock API implementation (HTTP-based)
-  - Proper error handling with ServerException
-  - Ready for real API integration
-
-- **Local Data Source**
-  - SharedPreferences-based caching
-  - JSON serialization for storage
-  - Proper error handling with CacheException
-
-#### 4. Core Layer
-- **Network**
-  - NetworkInfo interface
-  - InternetConnectionChecker implementation
-  - Reliable connectivity detection
-
-- **Error Handling**
-  - Custom exceptions (ServerException, CacheException)
-  - Failure classes for domain layer
-  - Either type for functional error handling
-
-## Project Structure
-
-```
-lib/
-├── core/                    # Core functionality and shared components
-│   ├── error/              # Error handling (exceptions, failures)
-│   └── network/            # Network connectivity handling
-└── features/
-    └── product/            # Product feature module
-        ├── data/           # Data layer
-        │   ├── datasources/  # Remote and local data sources
-        │   ├── models/      # Data models
-        │   └── repositories/ # Repository implementations
-        ├── domain/         # Domain layer
-        │   ├── entities/    # Business entities
-        │   ├── repositories/ # Repository contracts
-        │   └── usecases/    # Business use cases
-        └── presentation/    # Presentation layer
-            ├── bloc/        # BLoC pattern implementation
-            ├── pages/       # Screen implementations
-            └── widgets/     # Reusable UI components
-│   └── repositories/
-│       └── product_repository.dart
-├── config/
-│   ├── page_transitions.dart
-│   └── routes.dart
-├── screens/
-│   ├── add_update_page.dart
-│   ├── details_page.dart
-│   ├── home_page.dart
-│   └── search_page.dart
-└── main.dart
-```
-
-## Data Flow
-
-1. UI Layer (Screens)
-   - Displays data to users
-   - Captures user input
-   - Communicates with Use Cases
-
-2. Domain Layer
-   - Contains business logic
-   - Defines entity structures
-   - Provides use case interfaces
-
-3. Data Layer
-   - Implements data models
-   - Handles data conversion
-   - Manages data persistence
-
-## Features
-
-- Create, Read, Update, and Delete products
-- Search products by name
-- Detailed product view
-- Modern and responsive UI
-- Clean Architecture design
-- Test-Driven Development approach
+A Flutter-based mobile application for managing products and chatting with sellers.
 
 ## Getting Started
 
-1. Ensure you have Flutter installed
-2. Clone the repository
-3. Run `flutter pub get` to install dependencies
-4. Run `flutter run` to start the application
+### Prerequisites
+- Flutter SDK (latest stable version)
+- Dart SDK (latest stable version)
+- Android Studio / VS Code with Flutter extension
 
-## Architecture Overview
+### Installation
+1. Clone the repository:
+```bash
+git clone [repository-url]
+cd ecommerce_app
+```
 
-The application follows Clean Architecture principles with three main layers:
+2. Install dependencies:
+```bash
+flutter pub get
+```
 
-1. **Domain Layer**
-   - Contains business logic and entities
-   - No dependencies on external packages
-   - Pure Dart code
-   - Includes:
-     - Entities (e.g., Product)
-     - Use Cases (CRUD operations)
-     - Repository Interfaces
+3. Run the app:
+```bash
+flutter run
+```
 
-2. **Data Layer**
-   - Implements data access and storage
-   - Includes:
-     - Models (JSON serialization)
-     - Data Source Contracts
-       - Remote Data Source (API)
-       - Local Data Source (Cache)
-     - Repository Implementation
-   - Handles data conversion and caching
+### Features
+- Product browsing and management
+- User authentication
+- Real-time chat with sellers
+- Product search and filtering
 
-3. **Presentation Layer**
-   - User interface and interaction
-   - Implements screens and widgets
-   - Uses Material Design components
-   - Handles user input and display
+### Environment
+The app uses the following backend URL:
+```
+https://g5-flutter-learning-path-be-tvum.onrender.com/api/v2
+```
 
-## Dependencies
-
-- Flutter SDK
-- Material Design components
-- internet_connection_checker: Network connectivity detection
-
-## Network Handling
-
-1. **NetworkInfo Implementation**
-   - Uses InternetConnectionChecker for reliable connectivity detection
-   - Abstract NetworkInfo interface for dependency inversion
-   - NetworkInfoImpl concrete implementation
-   - Unit tested with mock-based testing
-
-2. **Network-Aware Features**
-   - Automatic online/offline mode switching
-   - Local data caching for offline access
-   - Graceful error handling for network failures
-
-## Contributing
-
-Feel free to submit issues and enhancement requests.

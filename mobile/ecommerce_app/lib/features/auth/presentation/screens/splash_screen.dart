@@ -5,20 +5,34 @@ import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
 
-
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Check auth status when splash screen is built
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
     context.read<AuthBloc>().add(CheckAuthStatusEvent());
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is AuthAuthenticated) {
-          Navigator.of(context).pushReplacementNamed(Routes.home);
-        } else if (state is AuthUnauthenticated) {
-          Navigator.of(context).pushReplacementNamed(Routes.signIn);
+        if (state is AuthAuthenticated || state is AuthUnauthenticated) {
+          Future.delayed(const Duration(seconds: 2), () {
+            if (mounted) {
+              if (state is AuthAuthenticated) {
+                Navigator.of(context).pushReplacementNamed(Routes.home);
+              } else {
+                Navigator.of(context).pushReplacementNamed(Routes.signIn);
+              }
+            }
+          });
         }
       },
       child: Scaffold(

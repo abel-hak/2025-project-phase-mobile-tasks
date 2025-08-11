@@ -70,14 +70,10 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> signOut() async {
     try {
-      final token = sharedPreferences.getString('token');
-      if (token != null) {
-        await remoteDataSource.signOut(token);
-      }
       await sharedPreferences.remove('token');
       return const Right(null);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Failed to clear local data'));
     }
   }
 

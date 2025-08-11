@@ -4,6 +4,7 @@ import 'config/routes.dart';
 import 'injection_container.dart' as di;
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/bloc/auth_event.dart';
+import 'features/auth/presentation/bloc/auth_state.dart';
 import 'features/chat/presentation/bloc/chat_bloc.dart';
 import 'features/chat/presentation/bloc/chat_messages/chat_messages_bloc.dart';
 
@@ -30,7 +31,16 @@ class MyApp extends StatelessWidget {
           create: (_) => di.sl<ChatMessagesBloc>(),
         ),
       ],
-      child: MaterialApp(
+      child: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthUnauthenticated) {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              Routes.signIn,
+              (route) => false,
+            );
+          }
+        },
+        child: MaterialApp(
         title: 'Product App',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
@@ -38,6 +48,7 @@ class MyApp extends StatelessWidget {
         ),
         initialRoute: Routes.splash,
         onGenerateRoute: Routes.generateRoute,
+      ),
       ),
     );
   }
