@@ -34,7 +34,6 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
   final String socketNamespace;
 
   bool _isConnected = false;
-  bool _namespaceJoined = false;
   IO.Socket? _socket;
   static const int maxReconnectAttempts = 5;
 
@@ -43,7 +42,6 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
   final _messageDeliveredController =
       StreamController<MessageModel>.broadcast();
   final _connectionController = StreamController<bool>.broadcast();
-  final _pendingMessages = <MessageModel>[];
 
   ChatSocketDataSourceImpl(this.baseSocketUrl, {required this.socketNamespace});
 
@@ -53,47 +51,39 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
   @override
   void connect(String token) {
     try {
-      // If already connected, don't reconnect
-      if (_isConnected && _socket != null) {
+      // Prevent duplicate connections
+      if (_socket != null && _socket!.connected) {
         print('🔌 Socket already connected');
         return;
       }
-
-      // Cleanup existing socket if any
+      // Cleanup any existing socket
       if (_socket != null) {
-        print('🔌 Socket exists, cleaning up first...');
+        print('🔌 Cleaning up old socket instance...');
         disconnect();
       }
-
+      _isConnected = false;
       print('🔌 Connecting socket with token: $token');
-
-      // Create socket instance
       _socket = IO.io(
         baseSocketUrl,
         OptionBuilder()
-            .setTransports(['websocket'])
-            .setPath('/socket.io')
-            .setAuth({'token': token})
-            .setExtraHeaders({
-              'Authorization': 'Bearer $token',
-              'Content-Type': 'application/json',
-            })
-            .enableForceNew()
-            .disableAutoConnect()
-            .enableReconnection()
-            .setReconnectionAttempts(maxReconnectAttempts)
-            .setReconnectionDelay(1000)
-            .setReconnectionDelayMax(5000)
-            .setTimeout(20000)
-            .build(),
+          .setTransports(['websocket'])
+          .setPath('/socket.io')
+          .setAuth({'token': token})
+          .setExtraHeaders({
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          })
+          .enableForceNew()
+          .disableAutoConnect()
+          .enableReconnection()
+          .setReconnectionAttempts(maxReconnectAttempts)
+          .setReconnectionDelay(1000)
+          .setReconnectionDelayMax(5000)
+          .setTimeout(20000)
+          .build(),
       );
-
-      // Setup listeners before connecting
       _setupSocketListeners();
-
-      // Connect after setup
       _socket?.connect();
-
       print('🔌 Socket initialized, waiting for connection...');
     } catch (e, stackTrace) {
       print('❌ Error initializing socket: $e');
@@ -124,39 +114,17 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
 
   void _setupSocketListeners() {
     print('🔌 Socket initialized, setting up listeners...');
-
-    // Debug handlers for all events
     _socket?.onAny((event, data) {
       print('💬 Socket.IO event: $event, data: $data');
     });
-
-    // Connection state change handlers
     _socket?.onConnect((_) {
-      print('🔌 Socket connected, joining namespace...');
-      _socket?.emit('join', {'namespace': socketNamespace});
+      print('🔌 Socket connected. Ready to send messages.');
       _handleConnect();
     });
-
     _socket?.onDisconnect((_) => _handleDisconnect('Socket disconnected'));
     _socket?.onConnectError((err) => _handleError(err));
     _socket?.onError((err) => _handleError(err));
 
-    // Namespace join handlers
-    _socket?.on('join_success', (_) {
-      print('🔌 Successfully joined namespace: $socketNamespace');
-      _namespaceJoined = true;
-      _isConnected = true;
-      // Send any pending messages
-      _sendPendingMessages();
-    });
-
-    _socket?.on('join_error', (error) {
-      print('❌ Error joining namespace: $error');
-      _namespaceJoined = false;
-      _handleError('Failed to join namespace: $error');
-    });
-
-    // Message handlers
     _socket?.on('message:delivered', (data) {
       print('🔉 Message delivered: $data');
       try {
@@ -168,7 +136,6 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
         print('❌ Error parsing delivered message: $e');
       }
     });
-
     _socket?.on('message:received', (data) {
       print('🔈 Message received: $data');
       try {
@@ -179,16 +146,6 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
       } catch (e) {
         print('❌ Error parsing received message: $e');
       }
-    });
-
-    // Room join handlers
-    _socket?.on('room:joined', (data) {
-      print('🔌 Joined chat room: $data');
-    });
-
-    _socket?.on('room:error', (error) {
-      print('❌ Error joining chat room: $error');
-      _handleError('Failed to join chat room: $error');
     });
   }
 
@@ -222,14 +179,7 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
     }
   }
 
-  void _sendPendingMessages() {
-    if (_pendingMessages.isEmpty) return;
-    print('💬 Sending ${_pendingMessages.length} pending messages...');
-    for (final message in _pendingMessages) {
-      _sendMessageNow(message);
-    }
-    _pendingMessages.clear();
-  }
+
 
   void _sendMessageNow(MessageModel message) {
     final payload = jsonEncode(message.toJson());
@@ -242,13 +192,6 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
     if (!_isConnected || _socket == null) {
       throw Exception('Socket not connected');
     }
-
-    if (!_namespaceJoined) {
-      print('💬 Queuing message until namespace join is confirmed...');
-      _pendingMessages.add(message);
-      return;
-    }
-
     _sendMessageNow(message);
   }
 
